@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AppHeader from "@/components/AppHeader";
-import { ChevronRight, Plus } from "lucide-react";
+import { ChevronRight, Plus, Pencil } from "lucide-react";
 import { useLoan, LoanEntry } from "@/context/LoanContext";
 
 interface FetchedLoan extends LoanEntry {
@@ -15,21 +15,25 @@ const BUREAU_LOANS: FetchedLoan[] = [
 
 const BureauResults = () => {
   const navigate = useNavigate();
-  const { setSelectedLoans, selectedLoans, formatCurrency } = useLoan();
+  const { setSelectedLoans, selectedLoans, formatCurrency, setEditingLoan } = useLoan();
   const [loans, setLoans] = useState<FetchedLoan[]>(BUREAU_LOANS);
 
   const toggleLoan = (id: string) => {
     setLoans((prev) => prev.map((l) => l.id === id ? { ...l, selected: !l.selected } : l));
   };
 
+  const handleEdit = (loan: FetchedLoan, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const entry: LoanEntry = { ...loan };
+    setEditingLoan(entry);
+    navigate("/add-loan");
+  };
+
   const selected = loans.filter((l) => l.selected);
   const totalOutstanding = selected.reduce((s, l) => s + l.outstanding, 0);
-
-  // Include any already-added manual loans
   const manualLoans = selectedLoans.filter((l) => l.source === "manual");
 
   const handleProceed = () => {
-    // Save bureau-selected + existing manual loans into context
     const bureauSelected: LoanEntry[] = selected.map(({ selected: _, ...rest }) => rest);
     setSelectedLoans([...bureauSelected, ...manualLoans]);
     navigate("/loan-offer");
@@ -71,36 +75,49 @@ const BureauResults = () => {
                     </div>
                   </div>
                 </div>
-                <div className={`w-6 h-6 rounded border-2 shrink-0 mt-1 flex items-center justify-center transition-all ${
-                  loan.selected ? "bg-primary border-primary" : "border-muted-foreground/40"
-                }`}>
-                  {loan.selected && <span className="text-primary-foreground text-xs font-bold">✓</span>}
+                <div className="flex flex-col items-center gap-2 shrink-0 ml-2">
+                  <div className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-all ${
+                    loan.selected ? "bg-primary border-primary" : "border-muted-foreground/40"
+                  }`}>
+                    {loan.selected && <span className="text-primary-foreground text-xs font-bold">✓</span>}
+                  </div>
+                  <button onClick={(e) => handleEdit(loan, e)}
+                    className="p-1.5 rounded-full bg-secondary text-muted-foreground hover:text-foreground active:scale-95 transition-all">
+                    <Pencil size={14} />
+                  </button>
                 </div>
               </div>
             </button>
           ))}
 
-          {/* Show manually added loans */}
           {manualLoans.map((loan) => (
             <div key={loan.id} className="w-full text-left border-2 border-primary rounded-2xl p-5 bg-accent/30">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-base font-bold text-foreground">{loan.bank}</span>
-                <span className="text-[10px] bg-primary text-primary-foreground px-2 py-0.5 rounded-full">Manual</span>
-              </div>
-              <p className="text-xs text-muted-foreground mb-3">A/C: {loan.accountNumber}</p>
-              <div className="grid grid-cols-3 gap-2">
-                <div>
-                  <p className="text-[10px] text-muted-foreground">Outstanding</p>
-                  <p className="text-sm font-bold text-foreground">{formatCurrency(loan.outstanding)}</p>
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-base font-bold text-foreground">{loan.bank}</span>
+                    <span className="text-[10px] bg-primary text-primary-foreground px-2 py-0.5 rounded-full">Manual</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground mb-3">A/C: {loan.accountNumber}</p>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div>
+                      <p className="text-[10px] text-muted-foreground">Outstanding</p>
+                      <p className="text-sm font-bold text-foreground">{formatCurrency(loan.outstanding)}</p>
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-muted-foreground">EMI</p>
+                      <p className="text-sm font-bold text-foreground">{formatCurrency(loan.emi)}</p>
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-muted-foreground">Rate</p>
+                      <p className="text-sm font-bold text-foreground">{loan.rate}%</p>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-[10px] text-muted-foreground">EMI</p>
-                  <p className="text-sm font-bold text-foreground">{formatCurrency(loan.emi)}</p>
-                </div>
-                <div>
-                  <p className="text-[10px] text-muted-foreground">Rate</p>
-                  <p className="text-sm font-bold text-foreground">{loan.rate}%</p>
-                </div>
+                <button onClick={() => { setEditingLoan(loan); navigate("/add-loan"); }}
+                  className="p-1.5 rounded-full bg-secondary text-muted-foreground hover:text-foreground active:scale-95 transition-all shrink-0 mt-1">
+                  <Pencil size={14} />
+                </button>
               </div>
             </div>
           ))}

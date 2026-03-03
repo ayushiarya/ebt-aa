@@ -31,22 +31,23 @@ export interface LoanState {
   selectedLoanType: "ebt" | "new" | null;
   setSelectedLoanType: (t: "ebt" | "new" | null) => void;
 
-  // All selected loans (bureau + manual)
   selectedLoans: LoanEntry[];
   setSelectedLoans: (loans: LoanEntry[]) => void;
   addManualLoan: (loan: LoanEntry) => void;
+  updateLoan: (loan: LoanEntry) => void;
 
-  // Manual form data (for the add-loan screen)
+  // Edit mode
+  editingLoan: LoanEntry | null;
+  setEditingLoan: (loan: LoanEntry | null) => void;
+
   formData: LoanFormData;
   setFormData: (d: LoanFormData) => void;
 
-  // Slider values
   loanAmount: number;
   setLoanAmount: (n: number) => void;
   tenure: number;
   setTenure: (n: number) => void;
 
-  // Derived
   emi: number;
   totalOutstanding: number;
   totalCurrentEmi: number;
@@ -56,6 +57,12 @@ export interface LoanState {
   netDisbursal: number;
   formatCurrency: (n: number) => string;
 }
+
+const defaultFormData: LoanFormData = {
+  bankName: "", loanType: null, accountNumber: "",
+  sanctionedAmount: "", outstandingAmount: "", interestRate: "",
+  emi: "", emisPaid: "", emisLeft: "", documentType: "",
+};
 
 const LoanContext = createContext<LoanState | null>(null);
 
@@ -68,11 +75,8 @@ export const useLoan = () => {
 export const LoanProvider = ({ children }: { children: ReactNode }) => {
   const [selectedLoanType, setSelectedLoanType] = useState<"ebt" | "new" | null>("ebt");
   const [selectedLoans, setSelectedLoans] = useState<LoanEntry[]>([]);
-  const [formData, setFormData] = useState<LoanFormData>({
-    bankName: "", loanType: null, accountNumber: "",
-    sanctionedAmount: "", outstandingAmount: "", interestRate: "",
-    emi: "", emisPaid: "", emisLeft: "", documentType: "",
-  });
+  const [formData, setFormData] = useState<LoanFormData>(defaultFormData);
+  const [editingLoan, setEditingLoan] = useState<LoanEntry | null>(null);
   const [loanAmount, setLoanAmount] = useState(500000);
   const [tenure, setTenure] = useState(18);
 
@@ -88,12 +92,17 @@ export const LoanProvider = ({ children }: { children: ReactNode }) => {
     setSelectedLoans((prev) => [...prev, loan]);
   };
 
+  const updateLoan = (loan: LoanEntry) => {
+    setSelectedLoans((prev) => prev.map((l) => l.id === loan.id ? loan : l));
+  };
+
   const formatCurrency = (n: number) => "₹" + n.toLocaleString("en-IN");
 
   return (
     <LoanContext.Provider value={{
       selectedLoanType, setSelectedLoanType,
-      selectedLoans, setSelectedLoans, addManualLoan,
+      selectedLoans, setSelectedLoans, addManualLoan, updateLoan,
+      editingLoan, setEditingLoan,
       formData, setFormData,
       loanAmount, setLoanAmount, tenure, setTenure,
       emi, totalOutstanding, totalCurrentEmi,

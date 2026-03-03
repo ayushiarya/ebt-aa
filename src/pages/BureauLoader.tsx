@@ -1,13 +1,28 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+
+const STAGES = [
+  {
+    title: "Fetching your loan details securely from the credit bureau",
+    subtitle: "Please do not refresh, go back or close this page.",
+  },
+  {
+    title: "Generating Your Personalized Offer",
+    subtitle: "Please wait while we calculate the best balance transfer offer for you\n\nDo not refresh or close this page.",
+  },
+];
 
 const BureauLoader = () => {
   const navigate = useNavigate();
+  const [stage, setStage] = useState(0);
 
   useEffect(() => {
-    const timer = setTimeout(() => navigate("/bureau-results"), 3000);
-    return () => clearTimeout(timer);
+    const t1 = setTimeout(() => setStage(1), 2000);
+    const t2 = setTimeout(() => navigate("/bureau-results"), 4500);
+    return () => { clearTimeout(t1); clearTimeout(t2); };
   }, [navigate]);
+
+  const current = STAGES[stage];
 
   return (
     <div className="app-container min-h-screen flex flex-col bg-background">
@@ -31,11 +46,11 @@ const BureauLoader = () => {
           <span className="w-3.5 h-1 rounded-full bg-muted-foreground/20 inline-block" />
           <span className="w-3.5 h-1 rounded-full bg-muted-foreground/20 inline-block" />
         </div>
-        <h2 className="text-lg font-bold text-foreground text-center mb-3">
-          Fetching your loan details securely from the credit bureau
+        <h2 className="text-lg font-bold text-foreground text-center mb-3 transition-all duration-300">
+          {current.title}
         </h2>
-        <p className="text-sm text-muted-foreground text-center leading-relaxed">
-          Please do not refresh, go back or close this page
+        <p className="text-sm text-muted-foreground text-center leading-relaxed whitespace-pre-line">
+          {current.subtitle}
         </p>
       </div>
     </div>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import AppHeader from "@/components/AppHeader";
 import { Info, Eye, Trash2, Upload } from "lucide-react";
@@ -11,11 +11,32 @@ const DOC_TYPES = ["Select", "Repayment + Bank Statement", "Loan Statement", "NO
 
 const AddLoanDetails = () => {
   const navigate = useNavigate();
-  const { formData, setFormData, addManualLoan } = useLoan();
+  const { formData, setFormData, addManualLoan, editingLoan, setEditingLoan, updateLoan } = useLoan();
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [repaymentFile, setRepaymentFile] = useState<UploadedFile | null>(null);
   const [bankStatementFile, setBankStatementFile] = useState<UploadedFile | null>(null);
   const [submitted, setSubmitted] = useState(false);
+
+  const isEditMode = !!editingLoan;
+
+  // Prefill form when editing
+  useEffect(() => {
+    if (editingLoan) {
+      setFormData({
+        bankName: editingLoan.bank,
+        loanType: editingLoan.type === "Personal Loan" ? "personal" : "credit",
+        accountNumber: editingLoan.accountNumber,
+        sanctionedAmount: editingLoan.sanctionedAmount.toLocaleString("en-IN"),
+        outstandingAmount: editingLoan.outstanding.toLocaleString("en-IN"),
+        interestRate: editingLoan.rate.toString(),
+        emi: editingLoan.emi.toLocaleString("en-IN"),
+        emisPaid: editingLoan.emisPaid.toString(),
+        emisLeft: editingLoan.emisLeft.toString(),
+        documentType: "",
+      });
+    }
+    return () => setEditingLoan(null);
+  }, []);
 
   const update = (field: string, value: any) => {
     setFormData({ ...formData, [field]: value });
@@ -33,7 +54,7 @@ const AddLoanDetails = () => {
     if (!formData.emi) e.emi = "Please enter the EMI.";
     if (!formData.emisPaid) e.emisPaid = "Please enter the EMIs Paid.";
     if (!formData.emisLeft) e.emisLeft = "Please enter the EMIs Left.";
-    if (!formData.documentType || formData.documentType === "Select") e.documentType = "Please select Document Type.";
+    if (!formData.documentType || formData.documentType === "Select") e.documentType = "Please select your Document Type.";
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -42,9 +63,8 @@ const AddLoanDetails = () => {
     setSubmitted(true);
     if (!validate()) return;
 
-    // Add to context as a manual loan
-    addManualLoan({
-      id: "m_" + Date.now(),
+    const loanData = {
+      id: isEditMode ? editingLoan!.id : "m_" + Date.now(),
       bank: formData.bankName,
       type: formData.loanType === "personal" ? "Personal Loan" : "Credit Card",
       accountNumber: formData.accountNumber,
@@ -54,17 +74,21 @@ const AddLoanDetails = () => {
       rate: parseFloat(formData.interestRate.replace(/[^\d.]/g, "")) || 0,
       emisPaid: parseInt(formData.emisPaid) || 0,
       emisLeft: parseInt(formData.emisLeft) || 0,
-      source: "manual",
-    });
+      source: (isEditMode ? editingLoan!.source : "manual") as "bureau" | "manual",
+    };
 
-    // Reset form for potential another add
+    if (isEditMode) {
+      updateLoan(loanData);
+    } else {
+      addManualLoan(loanData);
+    }
+
     setFormData({
       bankName: "", loanType: null, accountNumber: "",
       sanctionedAmount: "", outstandingAmount: "", interestRate: "",
       emi: "", emisPaid: "", emisLeft: "", documentType: "",
     });
 
-    // Go back to bureau results
     navigate("/bureau-results");
   };
 
@@ -76,22 +100,25 @@ const AddLoanDetails = () => {
 
   return (
     <div className="app-container min-h-screen flex flex-col bg-background page-enter">
-      <AppHeader title="Add Details" />
+      <AppHeader title={isEditMode ? "Add Details" : "Add Loan Manually"} />
 
       <div className="flex-1 overflow-y-auto px-5 pt-5 pb-28">
         <FieldLabel text="Bank Name" error={errors.bankName} />
-        <select value={formData.bankName} onChange={(e) => update("bankName", e.target.value)}
-          className={`input-axis appearance-none mb-1 ${errors.bankName ? "input-error" : "border-border"}`}>
-          <option value="">Select</option>
-          {BANKS.map((b) => <option key={b} value={b}>{b}</option>)}
-        </select>
+        <div className="relative mb-1">
+          <select value={formData.bankName} onChange={(e) => update("bankName", e.target.value)}
+            className={`input-axis appearance-none pr-10 ${errors.bankName ? "input-error" : ""}`}>
+            <option value="">Select</option>
+            {BANKS.map((b) => <option key={b} value={b}>{b}</option>)}
+          </select>
+          <ChevronIcon />
+        </div>
         <ErrorText text={errors.bankName} />
 
         <FieldLabel text="Select Type" error={errors.loanType} />
         <div className="flex gap-3 mb-1">
           {(["personal", "credit"] as const).map((type) => (
             <button key={type} onClick={() => update("loanType", type)}
-              className={`px-5 py-3 rounded-full text-sm font-medium transition-all active:scale-[0.97] ${
+              className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all active:scale-[0.97] ${
                 formData.loanType === type ? "bg-primary text-primary-foreground shadow-sm" : "bg-background border border-border text-foreground"
               }`}>
               {type === "personal" ? "Personal Loan" : "Credit Card"}
@@ -100,43 +127,46 @@ const AddLoanDetails = () => {
         </div>
         <ErrorText text={errors.loanType} />
 
-        <div className="flex items-center gap-1 mt-4">
+        <div className="flex items-center gap-1 mt-3">
           <FieldLabel text="Loan Account Number" error={errors.accountNumber} />
           <Info size={14} className="text-muted-foreground mb-1" />
         </div>
         <input type="text" placeholder="123456XXXX" value={formData.accountNumber}
           onChange={(e) => update("accountNumber", e.target.value)}
-          className={`input-axis mb-1 ${errors.accountNumber ? "input-error" : "border-border"}`} />
+          className={`input-axis mb-1 ${errors.accountNumber ? "input-error" : ""}`} />
         <ErrorText text={errors.accountNumber} />
 
-        <div className="grid grid-cols-2 gap-3 mt-4">
+        <div className="grid grid-cols-2 gap-3 mt-3">
           <InputField label="Sanctioned Amount" placeholder="₹ 0" value={formData.sanctionedAmount} error={errors.sanctionedAmount} onChange={(v) => update("sanctionedAmount", v)} />
           <InputField label="Outstanding Amount" placeholder="₹ 0" value={formData.outstandingAmount} error={errors.outstandingAmount} onChange={(v) => update("outstandingAmount", v)} />
         </div>
-        <div className="grid grid-cols-2 gap-3 mt-4">
+        <div className="grid grid-cols-2 gap-3 mt-3">
           <InputField label="Interest Rate" placeholder="0 %" value={formData.interestRate} error={errors.interestRate} onChange={(v) => update("interestRate", v)} />
           <InputField label="EMI" placeholder="₹ 0" value={formData.emi} error={errors.emi} onChange={(v) => update("emi", v)} />
         </div>
-        <div className="grid grid-cols-2 gap-3 mt-4">
+        <div className="grid grid-cols-2 gap-3 mt-3">
           <InputField label="EMIs Paid" placeholder="0" value={formData.emisPaid} error={errors.emisPaid} onChange={(v) => update("emisPaid", v)} />
           <InputField label="EMIs Left" placeholder="0" value={formData.emisLeft} error={errors.emisLeft} onChange={(v) => update("emisLeft", v)} />
         </div>
 
-        <h3 className="text-base font-bold text-foreground mt-8 mb-3">Upload Documents</h3>
-        <div className="bg-accent/50 rounded-xl p-4 mb-5 flex gap-3">
-          <Info size={16} className="text-accent-foreground mt-0.5 shrink-0" />
-          <p className="text-xs text-muted-foreground leading-relaxed">We verify your details with the provided documents. Any mismatch may require resubmission.</p>
+        <h3 className="text-base font-bold text-foreground mt-7 mb-3">Upload Documents</h3>
+        <div className="bg-accent/50 rounded-xl p-4 mb-4 flex gap-3">
+          <Info size={16} className="text-muted-foreground mt-0.5 shrink-0" />
+          <p className="text-xs text-muted-foreground leading-relaxed">We verify your details with the provided documents. Any mismatch may require resubmission and delay processing.</p>
         </div>
 
         <FieldLabel text="Select Document Type" error={errors.documentType} />
-        <select value={formData.documentType} onChange={(e) => update("documentType", e.target.value)}
-          className={`input-axis appearance-none mb-1 ${errors.documentType ? "input-error" : "border-border"}`}>
-          {DOC_TYPES.map((d) => <option key={d} value={d}>{d}</option>)}
-        </select>
+        <div className="relative mb-1">
+          <select value={formData.documentType} onChange={(e) => update("documentType", e.target.value)}
+            className={`input-axis appearance-none pr-10 ${errors.documentType ? "input-error" : ""}`}>
+            {DOC_TYPES.map((d) => <option key={d} value={d}>{d}</option>)}
+          </select>
+          <ChevronIcon />
+        </div>
         <ErrorText text={errors.documentType} />
 
         {showDocUploads && (
-          <div className="mt-5 space-y-5">
+          <div className="mt-4 space-y-5">
             <div>
               <p className="text-sm font-semibold text-foreground mb-2">Repayment Schedule</p>
               {repaymentFile ? (
@@ -166,11 +196,17 @@ const AddLoanDetails = () => {
       </div>
 
       <div className="sticky-cta">
-        <button onClick={handleSave} disabled={!isFormFilled && !submitted} className="cta-primary">Save Details</button>
+        <button onClick={handleSave} disabled={!isFormFilled} className="cta-primary">Save Details</button>
       </div>
     </div>
   );
 };
+
+const ChevronIcon = () => (
+  <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+  </div>
+);
 
 const FieldLabel = ({ text, error }: { text: string; error?: string }) => (
   <p className={`text-sm font-medium mb-1.5 ${error ? "text-destructive" : "text-foreground"}`}>{text}</p>
@@ -191,7 +227,7 @@ const InputField = ({ label, placeholder, value, error, onChange }: {
     <FieldLabel text={label} error={error} />
     <input type="text" placeholder={placeholder} value={value}
       onChange={(e) => onChange(e.target.value)}
-      className={`input-axis mb-1 ${error ? "input-error" : "border-border"}`} />
+      className={`input-axis mb-1 ${error ? "input-error" : ""}`} />
     <ErrorText text={error} />
   </div>
 );
