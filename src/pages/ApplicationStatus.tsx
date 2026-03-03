@@ -12,7 +12,7 @@ const ApplicationStatus = () => {
           <span className="text-primary-foreground font-bold text-sm">A</span>
         </div>
         <span className="text-primary-foreground font-bold text-sm tracking-wide">
-          <span className="opacity-80">open</span> | PERSONAL LOAN
+          <span className="opacity-80">open</span> | 24/7 PERSONAL LOANS
         </span>
       </div>
 
@@ -24,13 +24,13 @@ const ApplicationStatus = () => {
         <h2 className="text-xl font-bold text-foreground text-center mb-3">
           Your loan application is under review
         </h2>
-        <p className="text-sm text-muted-foreground text-center mb-6">
-          We will share your loan application updates within 2–3 working days
+        <p className="text-sm text-muted-foreground text-center mb-6 leading-relaxed">
+          We will share your loan application updates within 2–3 working days on your registered mobile number and email.
         </p>
 
         <div className="bg-secondary rounded-lg px-4 py-3 mb-8">
           <p className="text-xs text-muted-foreground">Application ID</p>
-          <p className="text-sm font-bold text-foreground">BLA000001029055</p>
+          <p className="text-sm font-bold text-foreground">ID: BLA000001029055</p>
         </div>
       </div>
 

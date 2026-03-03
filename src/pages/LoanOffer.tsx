@@ -9,10 +9,10 @@ const LoanOffer = () => {
   const [expanded, setExpanded] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
 
-  const loanAmount = 1200000;
-  const tenure = 18;
-  const emi = 11000;
-  const processingFee = 4716;
+  const loanAmount = 400000;
+  const tenure = 60;
+  const emi = 9834;
+  const processingFee = 4720;
   const stampDuty = 410;
   const interestRate = 16.5;
   const currentOutstanding = 200000;
@@ -22,71 +22,66 @@ const LoanOffer = () => {
 
   return (
     <div className="app-container min-h-screen flex flex-col bg-background">
-      <AppHeader title="Loan Offer" />
+      <AppHeader title="Loan Offer" showBack />
 
       <div className="flex-1 overflow-y-auto px-4 pt-4 pb-28">
-        {/* EMI summary */}
-        <div className="bg-secondary rounded-xl p-4 mb-6">
-          <div className="flex items-center gap-2">
-            <span className="font-bold text-foreground">EMI</span>
-            <span className="text-muted-foreground">|</span>
-            <span className="text-xl font-bold text-foreground">
-              {formatCurrency(emi)}/m
-            </span>
-            <span className="text-sm text-muted-foreground">
-              × {tenure} months
-            </span>
+        {/* Savings highlight */}
+        <div className="bg-accent rounded-xl p-4 mb-4">
+          <p className="text-xs text-muted-foreground mb-1">YOU COULD SAVE</p>
+          <p className="text-xl font-bold text-primary">₹3,711/month*</p>
+          <p className="text-xs text-muted-foreground">4.5% reduction in monthly EMI</p>
+          <p className="text-[10px] text-muted-foreground mt-2 italic">
+            *This calculation assumes a maximum 48 months tenure. But final values may vary with the chosen tenure.
+          </p>
+        </div>
+
+        {/* Revised offer */}
+        <div className="bg-card border-2 border-primary rounded-xl p-4 mb-4">
+          <p className="text-xs text-muted-foreground mb-1">You have a revised loan offer of</p>
+          <p className="text-2xl font-bold text-foreground">{formatCurrency(loanAmount)}</p>
+          <p className="text-xs text-muted-foreground">@11.49% p.a. • 3.2% lower than current</p>
+        </div>
+
+        {/* EMI Plan */}
+        <p className="text-sm font-bold text-foreground mb-3">SELECT EMI PLAN</p>
+        <div className="flex gap-3 mb-4">
+          <div className="flex-1 border-2 border-primary rounded-xl p-3 bg-accent/30">
+            <span className="text-[10px] bg-primary text-primary-foreground px-2 py-0.5 rounded-full font-semibold">Popular</span>
+            <p className="text-lg font-bold text-foreground mt-2">{formatCurrency(emi)}</p>
+            <p className="text-xs text-muted-foreground">× {tenure} months</p>
           </div>
+          <button
+            onClick={() => navigate("/make-plan")}
+            className="flex-1 border border-border rounded-xl p-3 flex items-center justify-center"
+          >
+            <span className="text-sm text-primary font-semibold">Make your plan</span>
+          </button>
         </div>
 
-        {/* Loan Amount Summary */}
-        <div className="bg-card border border-border rounded-xl p-4 mb-4">
-          <Row label="Loan Amount" value={formatCurrency(loanAmount)} bold />
-        </div>
-
-        {/* Charges Summary */}
+        {/* Loans being transferred */}
+        <p className="text-sm font-bold text-foreground mb-3">Loans Being Transferred (2)</p>
         <div className="bg-card border border-border rounded-xl p-4 mb-4 space-y-3">
-          <Row
-            label={
-              <span className="flex items-center gap-1">
-                Processing fee (incl. of GST)
-                <Info size={12} className="text-muted-foreground cursor-pointer" onClick={() => setSheetOpen(true)} />
-              </span>
-            }
-            value={`- ${formatCurrency(processingFee)}`}
-          />
-          <Row label="Stamp duty" value={`- ${formatCurrency(stampDuty)}`} />
-          <Row label="Interest rate" value={`${interestRate}% pa`} />
-          <div className="border-t border-border pt-3">
-            <Row
-              label={
-                <span>
-                  <span className="flex items-center gap-1">
-                    Current Outstanding
-                    <Info size={12} className="text-muted-foreground" />
-                  </span>
-                  <span className="text-xs text-muted-foreground">(existing loans (2))</span>
-                </span>
-              }
-              value={
-                <span>
-                  <span className="block">-{formatCurrency(currentOutstanding)}</span>
-                  <button
-                    onClick={() => setSheetOpen(true)}
-                    className="text-primary text-xs font-semibold"
-                  >
-                    VIEW BREAKUP
-                  </button>
-                </span>
-              }
-            />
+          <div className="flex justify-between items-center text-sm">
+            <div>
+              <span className="text-foreground font-medium">HDFC Bank</span>
+              <span className="text-xs text-muted-foreground ml-2">· Personal Loan</span>
+            </div>
+            <span className="text-foreground">{formatCurrency(50000)}</span>
           </div>
-          <div className="border-t border-border pt-3">
-            <Row label="Net disbursal*" value={formatCurrency(netDisbursal)} bold />
+          <div className="flex justify-between items-center text-sm">
+            <div>
+              <span className="text-foreground font-medium">ICICI Bank</span>
+              <span className="text-xs text-muted-foreground ml-2">· Credit Card</span>
+            </div>
+            <span className="text-foreground">{formatCurrency(100000)}</span>
+          </div>
+          <div className="border-t border-border pt-3 flex justify-between items-center text-sm font-bold">
+            <span className="text-foreground">Total Outstanding</span>
+            <span className="text-foreground">{formatCurrency(150000)}</span>
           </div>
         </div>
 
-        {/* Expandable section */}
+        {/* Expandable breakdown */}
         <div className="border border-border rounded-xl overflow-hidden mb-4">
           <button
             onClick={() => setExpanded(!expanded)}
@@ -99,13 +94,34 @@ const LoanOffer = () => {
           </button>
 
           {expanded && (
-            <div className="px-4 pb-4 border-t border-border pt-3 space-y-2">
-              <p className="text-sm text-muted-foreground">
-                Net Disbursal = Loan Amount − Processing Fee − Stamp Duty − Current Outstanding of your existing loans.
-              </p>
-              <p className="text-sm text-muted-foreground">
-                The remaining amount after paying off your existing loans is credited to your bank account.
-              </p>
+            <div className="px-4 pb-4 border-t border-border pt-3 space-y-3">
+              <BreakupRow label="Loan amount" value={formatCurrency(loanAmount)} />
+              <BreakupRow label="Processing fee (incl. of GST)" value={`- ${formatCurrency(processingFee)}`} info onInfoClick={() => setSheetOpen(true)} />
+              <BreakupRow label="Stamp duty" value={`- ${formatCurrency(stampDuty)}`} />
+              <BreakupRow label="Interest rate" value={`${interestRate}% pa`} />
+              <div className="border-t border-border pt-3">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <span className="text-sm text-muted-foreground flex items-center gap-1">
+                      Current Outstanding
+                      <Info size={12} className="text-muted-foreground" />
+                    </span>
+                    <span className="text-xs text-muted-foreground">(existing loans (2))</span>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-sm text-foreground block">-{formatCurrency(currentOutstanding)}</span>
+                    <button
+                      onClick={() => setSheetOpen(true)}
+                      className="text-primary text-xs font-semibold"
+                    >
+                      VIEW BREAKUP
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div className="border-t border-border pt-3">
+                <BreakupRow label="Net disbursal*" value={formatCurrency(netDisbursal)} bold />
+              </div>
             </div>
           )}
         </div>
@@ -122,28 +138,34 @@ const LoanOffer = () => {
           <p className="text-xl font-bold text-foreground">{formatCurrency(netDisbursal)}</p>
         </div>
         <button
-          onClick={() => navigate("/make-plan")}
+          onClick={() => navigate("/review")}
           className="bg-primary text-primary-foreground px-8 py-3 rounded-lg font-semibold text-sm"
         >
-          Continue
+          Review Loan
         </button>
       </div>
 
       {/* Bottom Sheet */}
       <BottomSheetModal open={sheetOpen} onClose={() => setSheetOpen(false)}>
-        <h3 className="text-xl font-bold text-foreground mb-2">Existing Loan Breakup</h3>
-        <div className="space-y-3 mt-4">
-          <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">HDFC Personal Loan</span>
-            <span className="text-foreground font-medium">{formatCurrency(120000)}</span>
+        <h3 className="text-lg font-bold text-foreground mb-4">Current Outstanding Breakup</h3>
+        <div className="space-y-3">
+          <div className="flex justify-between items-center text-sm">
+            <div>
+              <span className="text-foreground font-medium">HDFC Bank</span>
+              <span className="text-xs text-muted-foreground ml-2">Personal Loan</span>
+            </div>
+            <span className="text-foreground font-medium">{formatCurrency(50000)}</span>
           </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">ICICI Credit Card</span>
-            <span className="text-foreground font-medium">{formatCurrency(80000)}</span>
+          <div className="flex justify-between items-center text-sm">
+            <div>
+              <span className="text-foreground font-medium">ICICI Bank</span>
+              <span className="text-xs text-muted-foreground ml-2">Credit Card</span>
+            </div>
+            <span className="text-foreground font-medium">{formatCurrency(100000)}</span>
           </div>
-          <div className="border-t border-border pt-3 flex justify-between text-sm font-bold">
-            <span className="text-foreground">Total Outstanding</span>
-            <span className="text-foreground">{formatCurrency(currentOutstanding)}</span>
+          <div className="border-t border-border pt-3 flex justify-between items-center">
+            <span className="text-sm font-bold text-foreground">Total Outstanding</span>
+            <span className="text-sm font-bold text-primary">{formatCurrency(150000)}</span>
           </div>
         </div>
         <button
@@ -157,20 +179,25 @@ const LoanOffer = () => {
   );
 };
 
-const Row = ({
+const BreakupRow = ({
   label,
   value,
   bold,
+  info,
+  onInfoClick,
 }: {
-  label: React.ReactNode;
-  value: React.ReactNode;
+  label: string;
+  value: string;
   bold?: boolean;
+  info?: boolean;
+  onInfoClick?: () => void;
 }) => (
-  <div className="flex justify-between items-start">
-    <span className={`text-sm ${bold ? "font-bold text-foreground" : "text-muted-foreground"}`}>
+  <div className="flex justify-between items-center">
+    <span className={`text-sm flex items-center gap-1 ${bold ? "font-bold text-foreground" : "text-muted-foreground"}`}>
       {label}
+      {info && <Info size={12} className="text-muted-foreground cursor-pointer" onClick={onInfoClick} />}
     </span>
-    <span className={`text-sm text-right ${bold ? "font-bold text-foreground" : "text-foreground"}`}>
+    <span className={`text-sm ${bold ? "font-bold text-foreground" : "text-foreground"}`}>
       {value}
     </span>
   </div>

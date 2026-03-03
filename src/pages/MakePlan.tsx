@@ -11,9 +11,6 @@ const MakePlan = () => {
 
   const formatCurrency = (n: number) => "₹" + n.toLocaleString("en-IN");
 
-  const loanAmountLabels = ["1L", "3L", "6L", "9L", "12L"];
-  const tenureLabels = ["12M", "24M", "36M", "48M"];
-
   return (
     <div className="app-container min-h-screen flex flex-col bg-background">
       <AppHeader title="Make your plan" />
@@ -45,9 +42,7 @@ const MakePlan = () => {
             </div>
           </div>
           <div className="flex justify-between text-xs text-muted-foreground mb-1 mt-3">
-            {loanAmountLabels.map((l) => (
-              <span key={l}>{l}</span>
-            ))}
+            <span>1L</span><span>3L</span><span>6L</span><span>9L</span><span>12L</span>
           </div>
           <input
             type="range"
@@ -72,9 +67,7 @@ const MakePlan = () => {
             </div>
           </div>
           <div className="flex justify-between text-xs text-muted-foreground mb-1 mt-3">
-            {tenureLabels.map((l) => (
-              <span key={l}>{l}</span>
-            ))}
+            <span>12M</span><span>24M</span><span>36M</span><span>48M</span>
           </div>
           <input
             type="range"
