@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, ReactNode, useEffect } from "react";
 
 export interface LoanEntry {
   id: string;
@@ -36,7 +36,6 @@ export interface LoanState {
   addManualLoan: (loan: LoanEntry) => void;
   updateLoan: (loan: LoanEntry) => void;
 
-  // Edit mode
   editingLoan: LoanEntry | null;
   setEditingLoan: (loan: LoanEntry | null) => void;
 
@@ -59,9 +58,16 @@ export interface LoanState {
 }
 
 const defaultFormData: LoanFormData = {
-  bankName: "", loanType: null, accountNumber: "",
-  sanctionedAmount: "", outstandingAmount: "", interestRate: "",
-  emi: "", emisPaid: "", emisLeft: "", documentType: "",
+  bankName: "",
+  loanType: null,
+  accountNumber: "",
+  sanctionedAmount: "",
+  outstandingAmount: "",
+  interestRate: "",
+  emi: "",
+  emisPaid: "",
+  emisLeft: "",
+  documentType: "",
 };
 
 const LoanContext = createContext<LoanState | null>(null);
@@ -73,42 +79,86 @@ export const useLoan = () => {
 };
 
 export const LoanProvider = ({ children }: { children: ReactNode }) => {
-  const [selectedLoanType, setSelectedLoanType] = useState<"ebt" | "new" | null>("ebt");
+  const [selectedLoanType, setSelectedLoanType] =
+    useState<"ebt" | "new" | null>("ebt");
+
   const [selectedLoans, setSelectedLoans] = useState<LoanEntry[]>([]);
   const [formData, setFormData] = useState<LoanFormData>(defaultFormData);
   const [editingLoan, setEditingLoan] = useState<LoanEntry | null>(null);
+
+  // 🔥 FIXED: No hardcoded 500000
   const [loanAmount, setLoanAmount] = useState(0);
   const [tenure, setTenure] = useState(18);
 
-  const totalOutstanding = selectedLoans.reduce((s, l) => s + l.outstanding, 0);
-  const totalCurrentEmi = selectedLoans.reduce((s, l) => s + l.emi, 0);
+  // Derived values
+  const totalOutstanding = selectedLoans.reduce(
+    (s, l) => s + l.outstanding,
+    0
+  );
+
+  const totalCurrentEmi = selectedLoans.reduce(
+    (s, l) => s + l.emi,
+    0
+  );
+
+  // 🔥 Auto-sync loanAmount with outstanding when loans change
+  useEffect(() => {
+    if (totalOutstanding > 0) {
+      setLoanAmount(totalOutstanding);
+    }
+  }, [totalOutstanding]);
+
   const processingFee = Math.round(loanAmount * 0.0118);
   const stampDuty = 410;
   const interestRate = 11.49;
-  const emi = Math.round(loanAmount / tenure + loanAmount * 0.015);
-  const netDisbursal = loanAmount - processingFee - stampDuty - totalOutstanding;
+
+  const emi = loanAmount > 0
+    ? Math.round(loanAmount / tenure + loanAmount * 0.015)
+    : 0;
+
+  const netDisbursal =
+    loanAmount - processingFee - stampDuty - totalOutstanding;
 
   const addManualLoan = (loan: LoanEntry) => {
     setSelectedLoans((prev) => [...prev, loan]);
   };
 
   const updateLoan = (loan: LoanEntry) => {
-    setSelectedLoans((prev) => prev.map((l) => l.id === loan.id ? loan : l));
+    setSelectedLoans((prev) =>
+      prev.map((l) => (l.id === loan.id ? loan : l))
+    );
   };
 
-  const formatCurrency = (n: number) => "₹" + n.toLocaleString("en-IN");
+  const formatCurrency = (n: number) =>
+    "₹" + n.toLocaleString("en-IN");
 
   return (
-    <LoanContext.Provider value={{
-      selectedLoanType, setSelectedLoanType,
-      selectedLoans, setSelectedLoans, addManualLoan, updateLoan,
-      editingLoan, setEditingLoan,
-      formData, setFormData,
-      loanAmount, setLoanAmount, tenure, setTenure,
-      emi, totalOutstanding, totalCurrentEmi,
-      processingFee, stampDuty, interestRate, netDisbursal,
-      formatCurrency,
-    }}>
+    <LoanContext.Provider
+      value={{
+        selectedLoanType,
+        setSelectedLoanType,
+        selectedLoans,
+        setSelectedLoans,
+        addManualLoan,
+        updateLoan,
+        editingLoan,
+        setEditingLoan,
+        formData,
+        setFormData,
+        loanAmount,
+        setLoanAmount,
+        tenure,
+        setTenure,
+        emi,
+        totalOutstanding,
+        totalCurrentEmi,
+        processingFee,
+        stampDuty,
+        interestRate,
+        netDisbursal,
+        formatCurrency,
+      }}
+    >
       {children}
     </LoanContext.Provider>
   );
