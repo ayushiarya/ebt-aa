@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode, useEffect } from "react";
+import { createContext, useContext, useState, ReactNode } from "react";
 
 export interface LoanEntry {
   id: string;
@@ -86,7 +86,6 @@ export const LoanProvider = ({ children }: { children: ReactNode }) => {
   const [formData, setFormData] = useState<LoanFormData>(defaultFormData);
   const [editingLoan, setEditingLoan] = useState<LoanEntry | null>(null);
 
-  // 🔥 FIXED: No hardcoded 500000
   const [loanAmount, setLoanAmount] = useState(0);
   const [tenure, setTenure] = useState(18);
 
@@ -101,20 +100,22 @@ export const LoanProvider = ({ children }: { children: ReactNode }) => {
     0
   );
 
-  // 🔥 Auto-sync loanAmount with outstanding when loans change
-  useEffect(() => {
-    if (totalOutstanding > 0) {
-      setLoanAmount(totalOutstanding);
-    }
-  }, [totalOutstanding]);
-
   const processingFee = Math.round(loanAmount * 0.0118);
   const stampDuty = 410;
   const interestRate = 11.49;
 
-  const emi = loanAmount > 0
-    ? Math.round(loanAmount / tenure + loanAmount * 0.015)
-    : 0;
+  // ✅ Real EMI formula
+  const monthlyRate = interestRate / 100 / 12;
+
+  const emi =
+    loanAmount > 0
+      ? Math.round(
+          (loanAmount *
+            monthlyRate *
+            Math.pow(1 + monthlyRate, tenure)) /
+            (Math.pow(1 + monthlyRate, tenure) - 1)
+        )
+      : 0;
 
   const netDisbursal =
     loanAmount - processingFee - stampDuty - totalOutstanding;
