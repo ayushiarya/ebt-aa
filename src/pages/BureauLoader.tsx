@@ -5,7 +5,7 @@ const BureauLoader = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const timer = setTimeout(() => navigate("/add-loan"), 3000);
+    const timer = setTimeout(() => navigate("/bureau-results"), 3000);
     return () => clearTimeout(timer);
   }, [navigate]);
 

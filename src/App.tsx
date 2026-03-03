@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LoanProvider } from "@/context/LoanContext";
 import Landing from "./pages/Landing";
 import BureauLoader from "./pages/BureauLoader";
+import BureauResults from "./pages/BureauResults";
 import AddLoanDetails from "./pages/AddLoanDetails";
 import LoanOffer from "./pages/LoanOffer";
 import MakePlan from "./pages/MakePlan";
@@ -26,6 +27,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Landing />} />
             <Route path="/bureau-loader" element={<BureauLoader />} />
+            <Route path="/bureau-results" element={<BureauResults />} />
             <Route path="/add-loan" element={<AddLoanDetails />} />
             <Route path="/loan-offer" element={<LoanOffer />} />
             <Route path="/make-plan" element={<MakePlan />} />
