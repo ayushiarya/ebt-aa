@@ -37,7 +37,7 @@ const Landing = () => {
         </span>
       </div>
 
-      <div className="flex-1 overflow-y-auto pb-28">
+      <div className="flex-1 overflow-y-auto pb-5">
         {/* Banner */}
         <div className="bg-accent mx-4 mt-4 rounded-2xl p-5 flex items-center gap-3">
           <div className="flex-1">
@@ -129,17 +129,17 @@ const Landing = () => {
             </label>
           ))}
         </div>
-      </div>
 
-      {/* Sticky CTA */}
-      <div className="sticky-cta">
-        <button
-          onClick={() => allChecked && selectedLoanType && navigate("/bureau-loader")}
-          disabled={!allChecked || !selectedLoanType}
-          className="cta-primary"
-        >
-          Proceed
-        </button>
+        {/* CTA inside scroll */}
+        <div className="px-5 mt-6">
+          <button
+            onClick={() => allChecked && selectedLoanType && navigate("/bureau-loader")}
+            disabled={!allChecked || !selectedLoanType}
+            className="cta-primary"
+          >
+            Proceed
+          </button>
+        </div>
       </div>
     </div>
   );
