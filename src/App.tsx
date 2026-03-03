@@ -8,6 +8,7 @@ import Landing from "./pages/Landing";
 import BureauLoader from "./pages/BureauLoader";
 import BureauResults from "./pages/BureauResults";
 import AddLoanDetails from "./pages/AddLoanDetails";
+import OfferLoader from "./pages/OfferLoader";
 import LoanOffer from "./pages/LoanOffer";
 import MakePlan from "./pages/MakePlan";
 import ReviewLoan from "./pages/ReviewLoan";
@@ -29,6 +30,7 @@ const App = () => (
             <Route path="/bureau-loader" element={<BureauLoader />} />
             <Route path="/bureau-results" element={<BureauResults />} />
             <Route path="/add-loan" element={<AddLoanDetails />} />
+            <Route path="/offer-loader" element={<OfferLoader />} />
             <Route path="/loan-offer" element={<LoanOffer />} />
             <Route path="/make-plan" element={<MakePlan />} />
             <Route path="/review" element={<ReviewLoan />} />

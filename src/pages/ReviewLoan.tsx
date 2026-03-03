@@ -14,7 +14,7 @@ const ReviewLoan = () => {
     <div className="app-container min-h-screen flex flex-col bg-background page-enter">
       <AppHeader title="Review your Loan" showBack />
 
-      <div className="flex-1 overflow-y-auto px-5 pt-5 pb-28">
+      <div className="flex-1 overflow-y-auto px-5 pt-5 pb-5">
         <h3 className="text-sm font-bold text-foreground mb-3 tracking-wide">Loan Summary</h3>
         <div className="bg-card border border-border rounded-2xl p-5 mb-5 space-y-4">
           <Row label="Merged Loan amount" value={formatCurrency(loanAmount)} icon />
@@ -51,10 +51,9 @@ const ReviewLoan = () => {
             Loan Amount of {formatCurrency(netDisbursal)} will be credited to your a/c ending ****7903. EMI will be debited from the same a/c.
           </p>
         </div>
-      </div>
 
-      <div className="sticky-cta">
-        <button onClick={() => navigate("/otp")} className="cta-primary">Proceed to OTP</button>
+        {/* CTA inside scroll */}
+        <button onClick={() => navigate("/otp")} className="cta-primary mb-4">Proceed to OTP</button>
       </div>
 
       <BottomSheetModal open={sheetOpen} onClose={() => setSheetOpen(false)}>

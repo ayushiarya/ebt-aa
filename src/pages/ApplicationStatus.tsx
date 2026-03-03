@@ -31,7 +31,7 @@ const ApplicationStatus = () => {
         </div>
       </div>
 
-      <div className="sticky-cta">
+      <div className="px-5 pb-5">
         <button onClick={() => navigate("/")} className="cta-primary">Logout</button>
       </div>
     </div>

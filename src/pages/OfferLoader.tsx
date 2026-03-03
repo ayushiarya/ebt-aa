@@ -1,11 +1,11 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const BureauLoader = () => {
+const OfferLoader = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const timer = setTimeout(() => navigate("/bureau-results"), 3000);
+    const timer = setTimeout(() => navigate("/loan-offer"), 3000);
     return () => clearTimeout(timer);
   }, [navigate]);
 
@@ -32,14 +32,17 @@ const BureauLoader = () => {
           <span className="w-3.5 h-1 rounded-full bg-muted-foreground/20 inline-block" />
         </div>
         <h2 className="text-lg font-bold text-foreground text-center mb-3">
-          Fetching your loan details securely from the credit bureau
+          Generating Your Personalized Offer
         </h2>
         <p className="text-sm text-muted-foreground text-center leading-relaxed">
-          Please do not refresh, go back or close this page.
+          Please wait while we calculate the best balance transfer offer for you
+        </p>
+        <p className="text-sm text-muted-foreground text-center mt-4">
+          Do not refresh or close this page.
         </p>
       </div>
     </div>
   );
 };
 
-export default BureauLoader;
+export default OfferLoader;

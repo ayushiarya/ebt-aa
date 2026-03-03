@@ -15,7 +15,7 @@ const MakePlan = () => {
     <div className="app-container min-h-screen flex flex-col bg-background page-enter">
       <AppHeader title="Make your plan" />
 
-      <div className="flex-1 overflow-y-auto px-5 pt-5 pb-28">
+      <div className="flex-1 overflow-y-auto px-5 pt-5 pb-5">
         {/* EMI summary */}
         <div className="bg-secondary rounded-2xl p-5 mb-6">
           <div className="flex items-center gap-2 flex-wrap">
@@ -78,7 +78,7 @@ const MakePlan = () => {
           {expanded && (
             <div className="px-5 pb-5 border-t border-border pt-4 space-y-3">
               <Row label="Loan amount" value={formatCurrency(loanAmount)} bold />
-              <Row label="Processing fee (incl. of GST)" value={`- ${formatCurrency(processingFee)}`} icon />
+              <Row label="Processing fee (incl. of GST)" value={`- ${formatCurrency(processingFee)}`} />
               <Row label="Stamp duty" value={`- ${formatCurrency(stampDuty)}`} />
               <Row label="Interest rate" value={`${interestRate}% pa`} />
               <div className="border-t border-border pt-3">
@@ -99,18 +99,19 @@ const MakePlan = () => {
             </div>
           )}
         </div>
-        <p className="text-xs text-muted-foreground mb-6">*Net Disbursal is the amount that you'll get in your bank account after the deductions.</p>
-      </div>
+        <p className="text-xs text-muted-foreground mb-5">*Net Disbursal is the amount that you'll get in your bank account after the deductions.</p>
 
-      <div className="sticky-cta flex items-center justify-between">
-        <div>
-          <p className="text-xs text-muted-foreground font-medium tracking-wide">NET DISBURSAL</p>
-          <p className="text-xl font-bold text-foreground">{formatCurrency(netDisbursal)}</p>
+        {/* CTA */}
+        <div className="flex items-center justify-between border-t border-border pt-4 mb-4">
+          <div>
+            <p className="text-xs text-muted-foreground font-medium tracking-wide">NET DISBURSAL</p>
+            <p className="text-xl font-bold text-foreground">{formatCurrency(netDisbursal)}</p>
+          </div>
+          <button onClick={() => navigate("/review")}
+            className="bg-primary text-primary-foreground px-8 py-3.5 rounded-xl font-semibold text-sm active:scale-[0.97] transition-transform shadow-md">
+            Confirm
+          </button>
         </div>
-        <button onClick={() => navigate("/review")}
-          className="bg-primary text-primary-foreground px-8 py-3.5 rounded-xl font-semibold text-sm active:scale-[0.97] transition-transform shadow-md">
-          Confirm
-        </button>
       </div>
 
       <BottomSheetModal open={sheetOpen} onClose={() => setSheetOpen(false)}>
@@ -136,11 +137,9 @@ const MakePlan = () => {
   );
 };
 
-const Row = ({ label, value, bold, icon }: { label: string; value: string; bold?: boolean; icon?: boolean }) => (
+const Row = ({ label, value, bold }: { label: string; value: string; bold?: boolean }) => (
   <div className="flex justify-between items-center">
-    <span className={`text-sm flex items-center gap-1 ${bold ? "font-bold text-foreground" : "text-muted-foreground"}`}>
-      {label} {icon && <Info size={12} className="text-muted-foreground" />}
-    </span>
+    <span className={`text-sm ${bold ? "font-bold text-foreground" : "text-muted-foreground"}`}>{label}</span>
     <span className={`text-sm ${bold ? "font-bold text-foreground" : "text-foreground"}`}>{value}</span>
   </div>
 );

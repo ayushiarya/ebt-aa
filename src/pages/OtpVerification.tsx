@@ -28,7 +28,7 @@ const OtpVerification = () => {
     <div className="app-container min-h-screen flex flex-col bg-background page-enter">
       <AppHeader title="Verification" showBack />
 
-      <div className="px-5 pt-5 flex-1">
+      <div className="flex-1 overflow-y-auto px-5 pt-5 pb-5">
         <h2 className="text-xl font-bold text-foreground leading-tight mb-2">
           Enter OTP sent on registered mobile number
         </h2>
@@ -56,16 +56,15 @@ const OtpVerification = () => {
           ))}
         </div>
 
-        <button className="text-primary font-semibold text-sm tracking-wide py-2 active:opacity-70">
+        <button className="text-primary font-semibold text-sm tracking-wide py-2 active:opacity-70 mb-8">
           RESEND OTP
         </button>
-      </div>
 
-      <div className="sticky-cta">
+        {/* CTA inside scroll */}
         <button
           onClick={() => allFilled && navigate("/status")}
           disabled={!allFilled}
-          className="cta-primary"
+          className="cta-primary mb-4"
         >
           Submit
         </button>

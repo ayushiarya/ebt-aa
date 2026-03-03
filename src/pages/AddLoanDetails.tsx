@@ -19,7 +19,6 @@ const AddLoanDetails = () => {
 
   const isEditMode = !!editingLoan;
 
-  // Prefill form when editing
   useEffect(() => {
     if (editingLoan) {
       setFormData({
@@ -102,7 +101,7 @@ const AddLoanDetails = () => {
     <div className="app-container min-h-screen flex flex-col bg-background page-enter">
       <AppHeader title={isEditMode ? "Add Details" : "Add Loan Manually"} />
 
-      <div className="flex-1 overflow-y-auto px-5 pt-5 pb-28">
+      <div className="flex-1 overflow-y-auto px-5 pt-5 pb-5">
         <FieldLabel text="Bank Name" error={errors.bankName} />
         <div className="relative mb-1">
           <select value={formData.bankName} onChange={(e) => update("bankName", e.target.value)}
@@ -193,10 +192,11 @@ const AddLoanDetails = () => {
             </div>
           </div>
         )}
-      </div>
 
-      <div className="sticky-cta">
-        <button onClick={handleSave} disabled={!isFormFilled} className="cta-primary">Save Details</button>
+        {/* CTA inside scroll */}
+        <div className="mt-6 mb-4">
+          <button onClick={handleSave} disabled={!isFormFilled} className="cta-primary">Save Details</button>
+        </div>
       </div>
     </div>
   );

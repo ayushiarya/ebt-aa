@@ -36,14 +36,14 @@ const BureauResults = () => {
   const handleProceed = () => {
     const bureauSelected: LoanEntry[] = selected.map(({ selected: _, ...rest }) => rest);
     setSelectedLoans([...bureauSelected, ...manualLoans]);
-    navigate("/loan-offer");
+    navigate("/offer-loader");
   };
 
   return (
     <div className="app-container min-h-screen flex flex-col bg-background page-enter">
       <AppHeader title="Select Loans" showBack />
 
-      <div className="flex-1 overflow-y-auto px-5 pt-5 pb-32">
+      <div className="flex-1 overflow-y-auto px-5 pt-5 pb-5">
         <p className="text-sm text-muted-foreground mb-1">We found the following loans from the credit bureau</p>
         <p className="text-xs text-muted-foreground mb-5">Select the loans you want to transfer to Axis Bank</p>
 
@@ -124,7 +124,7 @@ const BureauResults = () => {
         </div>
 
         <button onClick={() => navigate("/add-loan")}
-          className="w-full flex items-center justify-between border-2 border-dashed border-border rounded-2xl p-5 active:bg-accent/20 transition-colors">
+          className="w-full flex items-center justify-between border-2 border-dashed border-border rounded-2xl p-5 active:bg-accent/20 transition-colors mb-5">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-accent flex items-center justify-center">
               <Plus size={20} className="text-primary" />
@@ -136,11 +136,10 @@ const BureauResults = () => {
           </div>
           <ChevronRight size={18} className="text-muted-foreground" />
         </button>
-      </div>
 
-      <div className="sticky-cta">
+        {/* Summary + CTA at bottom of scroll */}
         {(selected.length + manualLoans.length) > 0 && (
-          <div className="flex justify-between items-center mb-3">
+          <div className="flex justify-between items-center mb-3 mt-4">
             <span className="text-xs text-muted-foreground">
               {selected.length + manualLoans.length} loan{(selected.length + manualLoans.length) > 1 ? "s" : ""} selected
             </span>
@@ -151,7 +150,7 @@ const BureauResults = () => {
         )}
         <button onClick={handleProceed}
           disabled={selected.length + manualLoans.length === 0}
-          className="cta-primary">
+          className="cta-primary mb-4">
           Proceed
         </button>
       </div>

@@ -17,7 +17,7 @@ const LoanOffer = () => {
     <div className="app-container min-h-screen flex flex-col bg-background page-enter">
       <AppHeader title="Loan Offer" showBack />
 
-      <div className="flex-1 overflow-y-auto px-5 pt-5 pb-28">
+      <div className="flex-1 overflow-y-auto px-5 pt-5 pb-5">
         {/* Savings */}
         {savings > 0 && (
           <div className="bg-accent rounded-2xl p-5 mb-5">
@@ -98,18 +98,19 @@ const LoanOffer = () => {
             </div>
           )}
         </div>
-        <p className="text-xs text-muted-foreground mb-6">*Net Disbursal is the amount credited to your account after deductions.</p>
-      </div>
+        <p className="text-xs text-muted-foreground mb-5">*Net Disbursal is the amount credited to your account after deductions.</p>
 
-      <div className="sticky-cta flex items-center justify-between">
-        <div>
-          <p className="text-xs text-muted-foreground font-medium tracking-wide">NET DISBURSAL</p>
-          <p className="text-xl font-bold text-foreground">{formatCurrency(netDisbursal)}</p>
+        {/* CTA */}
+        <div className="flex items-center justify-between border-t border-border pt-4 mb-4">
+          <div>
+            <p className="text-xs text-muted-foreground font-medium tracking-wide">NET DISBURSAL</p>
+            <p className="text-xl font-bold text-foreground">{formatCurrency(netDisbursal)}</p>
+          </div>
+          <button onClick={() => navigate("/make-plan")}
+            className="bg-primary text-primary-foreground px-8 py-3.5 rounded-xl font-semibold text-sm active:scale-[0.97] transition-transform shadow-md">
+            Continue
+          </button>
         </div>
-        <button onClick={() => navigate("/make-plan")}
-          className="bg-primary text-primary-foreground px-8 py-3.5 rounded-xl font-semibold text-sm active:scale-[0.97] transition-transform shadow-md">
-          Continue
-        </button>
       </div>
 
       <BottomSheetModal open={sheetOpen} onClose={() => setSheetOpen(false)}>
