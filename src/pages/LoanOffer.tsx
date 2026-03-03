@@ -7,15 +7,11 @@ import { useLoan } from "@/context/LoanContext";
 
 const LoanOffer = () => {
   const navigate = useNavigate();
-  const { loanAmount, tenure, emi, formatCurrency } = useLoan();
+  const { loanAmount, tenure, emi, formatCurrency, selectedLoans, totalOutstanding, processingFee, stampDuty, interestRate, netDisbursal, totalCurrentEmi } = useLoan();
   const [expanded, setExpanded] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
 
-  const processingFee = 4720;
-  const stampDuty = 410;
-  const interestRate = 16.5;
-  const currentOutstanding = 200000;
-  const netDisbursal = loanAmount - processingFee - stampDuty - currentOutstanding;
+  const savings = totalCurrentEmi - emi;
 
   return (
     <div className="app-container min-h-screen flex flex-col bg-background page-enter">
@@ -23,20 +19,20 @@ const LoanOffer = () => {
 
       <div className="flex-1 overflow-y-auto px-5 pt-5 pb-28">
         {/* Savings */}
-        <div className="bg-accent rounded-2xl p-5 mb-5">
-          <p className="text-xs text-muted-foreground mb-1 tracking-wide">YOU COULD SAVE</p>
-          <p className="text-xl font-bold text-primary">₹3,711/month*</p>
-          <p className="text-xs text-muted-foreground">4.5% reduction in monthly EMI</p>
-          <p className="text-[10px] text-muted-foreground mt-2 italic">
-            *Assumes max 48 months tenure. Final values may vary.
-          </p>
-        </div>
+        {savings > 0 && (
+          <div className="bg-accent rounded-2xl p-5 mb-5">
+            <p className="text-xs text-muted-foreground mb-1 tracking-wide">YOU COULD SAVE</p>
+            <p className="text-xl font-bold text-primary">{formatCurrency(savings)}/month*</p>
+            <p className="text-xs text-muted-foreground">Reduction in monthly EMI</p>
+            <p className="text-[10px] text-muted-foreground mt-2 italic">*Assumes max 48 months tenure. Final values may vary.</p>
+          </div>
+        )}
 
         {/* Offer */}
         <div className="bg-card border-2 border-primary rounded-2xl p-5 mb-5">
           <p className="text-xs text-muted-foreground mb-1">You have a revised loan offer of</p>
           <p className="text-2xl font-bold text-foreground">{formatCurrency(loanAmount)}</p>
-          <p className="text-xs text-muted-foreground">@11.49% p.a. • 3.2% lower than current</p>
+          <p className="text-xs text-muted-foreground">@{interestRate}% p.a. • Lower than current rate</p>
         </div>
 
         {/* EMI Plan */}
@@ -54,13 +50,20 @@ const LoanOffer = () => {
         </div>
 
         {/* Loans transferred */}
-        <p className="text-sm font-bold text-foreground mb-3">Loans Being Transferred (2)</p>
+        <p className="text-sm font-bold text-foreground mb-3">Loans Being Transferred ({selectedLoans.length})</p>
         <div className="bg-card border border-border rounded-2xl p-5 mb-5 space-y-3">
-          <LoanRow bank="HDFC Bank" type="Personal Loan" amount={formatCurrency(50000)} />
-          <LoanRow bank="ICICI Bank" type="Credit Card" amount={formatCurrency(100000)} />
+          {selectedLoans.map((loan) => (
+            <div key={loan.id} className="flex justify-between items-center text-sm">
+              <div>
+                <span className="text-foreground font-medium">{loan.bank}</span>
+                <span className="text-xs text-muted-foreground ml-2">· {loan.type}</span>
+              </div>
+              <span className="text-foreground">{formatCurrency(loan.outstanding)}</span>
+            </div>
+          ))}
           <div className="border-t border-border pt-3 flex justify-between items-center text-sm font-bold">
             <span className="text-foreground">Total Outstanding</span>
-            <span className="text-foreground">{formatCurrency(150000)}</span>
+            <span className="text-foreground">{formatCurrency(totalOutstanding)}</span>
           </div>
         </div>
 
@@ -80,16 +83,12 @@ const LoanOffer = () => {
               <div className="border-t border-border pt-3">
                 <div className="flex justify-between items-start">
                   <div>
-                    <span className="text-sm text-muted-foreground flex items-center gap-1">
-                      Current Outstanding <Info size={12} className="text-muted-foreground" />
-                    </span>
-                    <span className="text-xs text-muted-foreground">(existing loans (2))</span>
+                    <span className="text-sm text-muted-foreground flex items-center gap-1">Current Outstanding <Info size={12} /></span>
+                    <span className="text-xs text-muted-foreground">(existing loans ({selectedLoans.length}))</span>
                   </div>
                   <div className="text-right">
-                    <span className="text-sm text-foreground block">-{formatCurrency(currentOutstanding)}</span>
-                    <button onClick={() => setSheetOpen(true)} className="text-primary text-xs font-bold mt-1 active:opacity-70">
-                      VIEW BREAKUP
-                    </button>
+                    <span className="text-sm text-foreground block">-{formatCurrency(totalOutstanding)}</span>
+                    <button onClick={() => setSheetOpen(true)} className="text-primary text-xs font-bold mt-1 active:opacity-70">VIEW BREAKUP</button>
                   </div>
                 </div>
               </div>
@@ -99,13 +98,9 @@ const LoanOffer = () => {
             </div>
           )}
         </div>
-
-        <p className="text-xs text-muted-foreground mb-6">
-          *Net Disbursal is the amount credited to your account after deductions.
-        </p>
+        <p className="text-xs text-muted-foreground mb-6">*Net Disbursal is the amount credited to your account after deductions.</p>
       </div>
 
-      {/* Sticky bottom */}
       <div className="sticky-cta flex items-center justify-between">
         <div>
           <p className="text-xs text-muted-foreground font-medium tracking-wide">NET DISBURSAL</p>
@@ -120,11 +115,18 @@ const LoanOffer = () => {
       <BottomSheetModal open={sheetOpen} onClose={() => setSheetOpen(false)}>
         <h3 className="text-lg font-bold text-foreground mb-4">Current Outstanding Breakup</h3>
         <div className="space-y-3">
-          <LoanRow bank="HDFC Bank" type="Personal Loan" amount={formatCurrency(50000)} />
-          <LoanRow bank="ICICI Bank" type="Credit Card" amount={formatCurrency(100000)} />
+          {selectedLoans.map((loan) => (
+            <div key={loan.id} className="flex justify-between items-center text-sm">
+              <div>
+                <span className="text-foreground font-medium">{loan.bank}</span>
+                <span className="text-xs text-muted-foreground ml-2">{loan.type}</span>
+              </div>
+              <span className="text-foreground font-medium">{formatCurrency(loan.outstanding)}</span>
+            </div>
+          ))}
           <div className="border-t border-border pt-3 flex justify-between items-center">
             <span className="text-sm font-bold text-foreground">Total Outstanding</span>
-            <span className="text-sm font-bold text-primary">{formatCurrency(150000)}</span>
+            <span className="text-sm font-bold text-primary">{formatCurrency(totalOutstanding)}</span>
           </div>
         </div>
         <button onClick={() => setSheetOpen(false)} className="cta-primary mt-6">Okay</button>
@@ -137,16 +139,6 @@ const Row = ({ label, value, bold }: { label: string; value: string; bold?: bool
   <div className="flex justify-between items-center">
     <span className={`text-sm ${bold ? "font-bold text-foreground" : "text-muted-foreground"}`}>{label}</span>
     <span className={`text-sm ${bold ? "font-bold text-foreground" : "text-foreground"}`}>{value}</span>
-  </div>
-);
-
-const LoanRow = ({ bank, type, amount }: { bank: string; type: string; amount: string }) => (
-  <div className="flex justify-between items-center text-sm">
-    <div>
-      <span className="text-foreground font-medium">{bank}</span>
-      <span className="text-xs text-muted-foreground ml-2">· {type}</span>
-    </div>
-    <span className="text-foreground">{amount}</span>
   </div>
 );
 
