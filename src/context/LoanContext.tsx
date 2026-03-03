@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, ReactNode, useEffect } from "react";
 
 export interface LoanEntry {
   id: string;
@@ -89,7 +89,7 @@ export const LoanProvider = ({ children }: { children: ReactNode }) => {
   const [loanAmount, setLoanAmount] = useState(0);
   const [tenure, setTenure] = useState(18);
 
-  // Derived values
+  // 🔹 Derived values
   const totalOutstanding = selectedLoans.reduce(
     (s, l) => s + l.outstanding,
     0
@@ -100,11 +100,20 @@ export const LoanProvider = ({ children }: { children: ReactNode }) => {
     0
   );
 
+  // 🔥 OFFER GENERATION LOGIC (10% top-up)
+  useEffect(() => {
+    if (totalOutstanding > 0) {
+      const topUp = Math.round(totalOutstanding * 0.1);
+      const generatedOffer = totalOutstanding + topUp;
+      setLoanAmount(generatedOffer);
+    }
+  }, [totalOutstanding]);
+
   const processingFee = Math.round(loanAmount * 0.0118);
   const stampDuty = 410;
   const interestRate = 11.49;
 
-  // ✅ Real EMI formula
+  // ✅ Proper EMI formula
   const monthlyRate = interestRate / 100 / 12;
 
   const emi =
