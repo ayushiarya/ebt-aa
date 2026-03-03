@@ -103,7 +103,7 @@ export const LoanProvider = ({ children }: { children: ReactNode }) => {
   // 🔥 OFFER GENERATION LOGIC (10% top-up)
   useEffect(() => {
     if (totalOutstanding > 0) {
-      const topUp = Math.round(totalOutstanding * 0.1);
+      const topUp = Math.round(totalOutstanding * .46);
       const generatedOffer = totalOutstanding + topUp;
       setLoanAmount(generatedOffer);
     }
