@@ -71,7 +71,7 @@ const AddLoanDetails = () => {
   const handleSave = () => {
     setSubmitted(true);
     if (validate()) {
-      navigate("/generating-offer");
+      navigate("/loan-offer");
     }
   };
 

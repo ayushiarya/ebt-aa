@@ -6,27 +6,23 @@ import BottomSheetModal from "@/components/BottomSheetModal";
 
 const LoanOffer = () => {
   const navigate = useNavigate();
-  const [loanAmount, setLoanAmount] = useState(1200000);
-  const [tenure, setTenure] = useState(20);
   const [expanded, setExpanded] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
 
-  const emi = Math.round(loanAmount / tenure + loanAmount * 0.015);
-  const processingFee = Math.round(loanAmount * 0.00393);
+  const loanAmount = 1200000;
+  const tenure = 18;
+  const emi = 11000;
+  const processingFee = 4716;
   const stampDuty = 410;
   const interestRate = 16.5;
   const currentOutstanding = 200000;
   const netDisbursal = loanAmount - processingFee - stampDuty - currentOutstanding;
 
-  const formatCurrency = (n: number) =>
-    "₹" + n.toLocaleString("en-IN");
-
-  const loanAmountLabels = ["1L", "3L", "6L", "9L", "12L"];
-  const tenureLabels = ["12M", "24M", "36M", "48M"];
+  const formatCurrency = (n: number) => "₹" + n.toLocaleString("en-IN");
 
   return (
     <div className="app-container min-h-screen flex flex-col bg-background">
-      <AppHeader title="Make your plan" />
+      <AppHeader title="Loan Offer" />
 
       <div className="flex-1 overflow-y-auto px-4 pt-4 pb-28">
         {/* EMI summary */}
@@ -43,62 +39,55 @@ const LoanOffer = () => {
           </div>
         </div>
 
-        {/* Loan Amount Slider */}
+        {/* Loan Amount Summary */}
         <div className="bg-card border border-border rounded-xl p-4 mb-4">
-          <div className="flex justify-between items-center mb-1">
-            <div>
-              <p className="text-sm text-muted-foreground">Loan Amount</p>
-              <p className="text-xs text-muted-foreground">{interestRate}% p.a</p>
-            </div>
-            <div className="border border-border rounded-lg px-3 py-2 text-sm font-medium text-foreground">
-              {formatCurrency(loanAmount)}
-            </div>
-          </div>
-          <div className="flex justify-between text-xs text-muted-foreground mb-1 mt-3">
-            {loanAmountLabels.map((l) => (
-              <span key={l}>{l}</span>
-            ))}
-          </div>
-          <input
-            type="range"
-            min={100000}
-            max={1200000}
-            step={50000}
-            value={loanAmount}
-            onChange={(e) => setLoanAmount(Number(e.target.value))}
-            className="w-full h-2 bg-border rounded-full appearance-none cursor-pointer accent-foreground [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-foreground"
-          />
+          <Row label="Loan Amount" value={formatCurrency(loanAmount)} bold />
         </div>
 
-        {/* Tenure Slider */}
-        <div className="bg-card border border-border rounded-xl p-4 mb-6">
-          <div className="flex justify-between items-center mb-1">
-            <div>
-              <p className="text-sm text-muted-foreground">Tenure</p>
-              <p className="text-xs text-muted-foreground">(In months)</p>
-            </div>
-            <div className="border border-border rounded-lg px-3 py-2 text-sm font-medium text-foreground">
-              {tenure}
-            </div>
-          </div>
-          <div className="flex justify-between text-xs text-muted-foreground mb-1 mt-3">
-            {tenureLabels.map((l) => (
-              <span key={l}>{l}</span>
-            ))}
-          </div>
-          <input
-            type="range"
-            min={12}
-            max={48}
-            step={1}
-            value={tenure}
-            onChange={(e) => setTenure(Number(e.target.value))}
-            className="w-full h-2 bg-border rounded-full appearance-none cursor-pointer accent-foreground [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-foreground"
+        {/* Charges Summary */}
+        <div className="bg-card border border-border rounded-xl p-4 mb-4 space-y-3">
+          <Row
+            label={
+              <span className="flex items-center gap-1">
+                Processing fee (incl. of GST)
+                <Info size={12} className="text-muted-foreground cursor-pointer" onClick={() => setSheetOpen(true)} />
+              </span>
+            }
+            value={`- ${formatCurrency(processingFee)}`}
           />
+          <Row label="Stamp duty" value={`- ${formatCurrency(stampDuty)}`} />
+          <Row label="Interest rate" value={`${interestRate}% pa`} />
+          <div className="border-t border-border pt-3">
+            <Row
+              label={
+                <span>
+                  <span className="flex items-center gap-1">
+                    Current Outstanding
+                    <Info size={12} className="text-muted-foreground" />
+                  </span>
+                  <span className="text-xs text-muted-foreground">(existing loans (2))</span>
+                </span>
+              }
+              value={
+                <span>
+                  <span className="block">-{formatCurrency(currentOutstanding)}</span>
+                  <button
+                    onClick={() => setSheetOpen(true)}
+                    className="text-primary text-xs font-semibold"
+                  >
+                    VIEW BREAKUP
+                  </button>
+                </span>
+              }
+            />
+          </div>
+          <div className="border-t border-border pt-3">
+            <Row label="Net disbursal*" value={formatCurrency(netDisbursal)} bold />
+          </div>
         </div>
 
-        {/* Net Disbursal Breakdown */}
-        <div className="border border-border rounded-xl overflow-hidden">
+        {/* Expandable section */}
+        <div className="border border-border rounded-xl overflow-hidden mb-4">
           <button
             onClick={() => setExpanded(!expanded)}
             className="w-full flex justify-between items-center p-4"
@@ -110,51 +99,18 @@ const LoanOffer = () => {
           </button>
 
           {expanded && (
-            <div className="px-4 pb-4 border-t border-border pt-3 space-y-3">
-              <Row label="Loan amount" value={formatCurrency(loanAmount)} bold />
-              <Row
-                label={
-                  <span className="flex items-center gap-1">
-                    Processing fee (incl. of GST)
-                    <Info size={12} className="text-muted-foreground cursor-pointer" onClick={() => setSheetOpen(true)} />
-                  </span>
-                }
-                value={`- ${formatCurrency(processingFee)}`}
-              />
-              <Row label="Stamp duty" value={`- ${formatCurrency(stampDuty)}`} />
-              <Row label="Interest rate" value={`${interestRate}% pa`} />
-              <div className="border-t border-border pt-3">
-                <Row
-                  label={
-                    <span>
-                      <span className="flex items-center gap-1">
-                        Current Outstanding
-                        <Info size={12} className="text-muted-foreground" />
-                      </span>
-                      <span className="text-xs text-muted-foreground">(existing loans (2))</span>
-                    </span>
-                  }
-                  value={
-                    <span>
-                      <span className="block">-{formatCurrency(currentOutstanding)}</span>
-                      <button
-                        onClick={() => setSheetOpen(true)}
-                        className="text-primary text-xs font-semibold"
-                      >
-                        VIEW BREAKUP
-                      </button>
-                    </span>
-                  }
-                />
-              </div>
-              <div className="border-t border-border pt-3">
-                <Row label="Net disbursal*" value={formatCurrency(netDisbursal)} bold />
-              </div>
+            <div className="px-4 pb-4 border-t border-border pt-3 space-y-2">
+              <p className="text-sm text-muted-foreground">
+                Net Disbursal = Loan Amount − Processing Fee − Stamp Duty − Current Outstanding of your existing loans.
+              </p>
+              <p className="text-sm text-muted-foreground">
+                The remaining amount after paying off your existing loans is credited to your bank account.
+              </p>
             </div>
           )}
         </div>
 
-        <p className="text-xs text-muted-foreground mt-3 mb-6">
+        <p className="text-xs text-muted-foreground mb-6">
           *Net Disbursal is the amount that you'll get in your bank account after the deductions.
         </p>
       </div>
@@ -166,27 +122,29 @@ const LoanOffer = () => {
           <p className="text-xl font-bold text-foreground">{formatCurrency(netDisbursal)}</p>
         </div>
         <button
-          onClick={() => navigate("/application-status")}
+          onClick={() => navigate("/make-plan")}
           className="bg-primary text-primary-foreground px-8 py-3 rounded-lg font-semibold text-sm"
         >
-          Confirm
+          Continue
         </button>
       </div>
 
       {/* Bottom Sheet */}
       <BottomSheetModal open={sheetOpen} onClose={() => setSheetOpen(false)}>
-        <h3 className="text-xl font-bold text-foreground mb-2">External Balance Transfer</h3>
-        <p className="text-sm text-muted-foreground mb-6">
-          Consolidate your loans into one Axis Bank Personal Loan for a lower interest rate.
-        </p>
-        <p className="text-xs font-bold text-foreground tracking-wide mb-4">HOW IT WORKS?</p>
-        <div className="space-y-0">
-          <StepItem icon="📋" text="Select the loans you want to close" showLine />
-          <StepItem icon="🤝" text="We pay loans directly to your lenders" showLine />
-          <StepItem
-            icon="₹"
-            text={<span>Your loans consolidate into <strong>one Axis Bank Personal Loan</strong></span>}
-          />
+        <h3 className="text-xl font-bold text-foreground mb-2">Existing Loan Breakup</h3>
+        <div className="space-y-3 mt-4">
+          <div className="flex justify-between text-sm">
+            <span className="text-muted-foreground">HDFC Personal Loan</span>
+            <span className="text-foreground font-medium">{formatCurrency(120000)}</span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span className="text-muted-foreground">ICICI Credit Card</span>
+            <span className="text-foreground font-medium">{formatCurrency(80000)}</span>
+          </div>
+          <div className="border-t border-border pt-3 flex justify-between text-sm font-bold">
+            <span className="text-foreground">Total Outstanding</span>
+            <span className="text-foreground">{formatCurrency(currentOutstanding)}</span>
+          </div>
         </div>
         <button
           onClick={() => setSheetOpen(false)}
@@ -215,26 +173,6 @@ const Row = ({
     <span className={`text-sm text-right ${bold ? "font-bold text-foreground" : "text-foreground"}`}>
       {value}
     </span>
-  </div>
-);
-
-const StepItem = ({
-  icon,
-  text,
-  showLine,
-}: {
-  icon: string;
-  text: React.ReactNode;
-  showLine?: boolean;
-}) => (
-  <div className="flex gap-3">
-    <div className="flex flex-col items-center">
-      <div className="w-10 h-10 rounded-full bg-accent flex items-center justify-center text-lg shrink-0">
-        {icon}
-      </div>
-      {showLine && <div className="w-0.5 h-8 bg-border" />}
-    </div>
-    <p className="text-sm text-foreground pt-2.5">{text}</p>
   </div>
 );
 
