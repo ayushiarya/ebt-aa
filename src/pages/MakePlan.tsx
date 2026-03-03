@@ -5,6 +5,8 @@ import AppHeader from "@/components/AppHeader";
 import BottomSheetModal from "@/components/BottomSheetModal";
 import { useLoan } from "@/context/LoanContext";
 
+const MAX_TOPUP = 200000;
+
 const MakePlan = () => {
   const navigate = useNavigate();
 
@@ -26,16 +28,19 @@ const MakePlan = () => {
   const [expanded, setExpanded] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
 
-  // 🔥 Derived locally (NO context change required)
   const baseOutstanding = totalOutstanding;
-  const currentTopUp = Math.max(loanAmount - baseOutstanding, 0);
+
+  const currentTopUp = Math.min(
+    Math.max(loanAmount - baseOutstanding, 0),
+    MAX_TOPUP
+  );
 
   return (
     <div className="app-container min-h-screen flex flex-col bg-background page-enter">
       <AppHeader title="Make your plan" />
 
       <div className="flex-1 overflow-y-auto px-5 pt-5 pb-5">
-        {/* EMI summary */}
+        {/* EMI */}
         <div className="bg-secondary rounded-2xl p-5 mb-6">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="font-bold text-foreground">EMI</span>
@@ -49,7 +54,7 @@ const MakePlan = () => {
           </div>
         </div>
 
-        {/* 🔥 TOP-UP SLIDER (NOT full loan anymore) */}
+        {/* Top-up Slider */}
         <div className="bg-card border border-border rounded-2xl p-5 mb-4">
           <div className="flex justify-between items-center mb-4">
             <div>
@@ -64,8 +69,9 @@ const MakePlan = () => {
               </p>
             </div>
 
+            {/* 🔥 Show ONLY top-up amount */}
             <div className="border border-border rounded-xl px-4 py-2.5 text-sm font-bold text-foreground min-w-[100px] text-center">
-              {formatCurrency(loanAmount)}
+              {formatCurrency(currentTopUp)}
             </div>
           </div>
 
@@ -80,7 +86,7 @@ const MakePlan = () => {
           <input
             type="range"
             min={0}
-            max={200000}
+            max={MAX_TOPUP}
             step={10000}
             value={currentTopUp}
             onChange={(e) => {
@@ -91,7 +97,7 @@ const MakePlan = () => {
           />
         </div>
 
-        {/* Tenure Slider */}
+        {/* Tenure */}
         <div className="bg-card border border-border rounded-2xl p-5 mb-6">
           <div className="flex justify-between items-center mb-4">
             <div>
@@ -121,7 +127,7 @@ const MakePlan = () => {
           />
         </div>
 
-        {/* Net Disbursal Breakdown */}
+        {/* Net Disbursal */}
         <div className="border border-border rounded-2xl overflow-hidden mb-5">
           <button
             onClick={() => setExpanded(!expanded)}
@@ -183,7 +189,6 @@ const MakePlan = () => {
           *Net Disbursal is the amount that you'll get in your bank account after the deductions.
         </p>
 
-        {/* CTA */}
         <div className="flex items-center justify-between border-t border-border pt-4 mb-4">
           <div>
             <p className="text-xs text-muted-foreground font-medium tracking-wide">
