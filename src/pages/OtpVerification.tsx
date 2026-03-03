@@ -1,10 +1,10 @@
 import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import AppHeader from "@/components/AppHeader";
-import { CheckCircle } from "lucide-react";
 
 const OtpVerification = () => {
+  const navigate = useNavigate();
   const [otp, setOtp] = useState<string[]>(Array(6).fill(""));
-  const [success, setSuccess] = useState(false);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   useEffect(() => {
@@ -32,46 +32,16 @@ const OtpVerification = () => {
 
   const handleSubmit = () => {
     if (allFilled) {
-      setSuccess(true);
+      navigate("/status");
     }
   };
 
-  if (success) {
-    return (
-      <div className="app-container min-h-screen flex flex-col bg-background">
-        <div className="bg-primary px-4 py-3 flex items-center gap-2">
-          <div className="w-8 h-8 bg-primary-foreground/20 rounded flex items-center justify-center">
-            <span className="text-primary-foreground font-bold text-sm">A</span>
-          </div>
-          <span className="text-primary-foreground font-bold text-sm tracking-wide">
-            <span className="opacity-80">open</span> | PERSONAL LOAN
-          </span>
-        </div>
-        <div className="flex-1 flex flex-col items-center justify-center px-8">
-          <div className="w-24 h-24 rounded-full bg-accent flex items-center justify-center mb-6">
-            <CheckCircle size={48} className="text-primary" />
-          </div>
-          <h2 className="text-xl font-bold text-foreground text-center mb-3">
-            Your loan application is under review
-          </h2>
-          <p className="text-sm text-muted-foreground text-center mb-6">
-            We will share your loan application updates within 2–3 working days
-          </p>
-          <div className="bg-secondary rounded-lg px-4 py-3">
-            <p className="text-xs text-muted-foreground">Application ID</p>
-            <p className="text-sm font-bold text-foreground">BLA000001029055</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="app-container min-h-screen flex flex-col bg-background">
-      <AppHeader title="Verification" />
+      <AppHeader title="Verification" showBack />
 
       <div className="px-6 pt-4 flex-1">
-        <h2 className="text-2xl font-bold text-foreground leading-tight mb-2">
+        <h2 className="text-xl font-bold text-foreground leading-tight mb-2">
           Enter OTP sent on registered mobile number
         </h2>
         <p className="text-sm text-muted-foreground mb-8">

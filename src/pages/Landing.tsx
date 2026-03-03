@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { CheckCircle2, Banknote, ArrowRightLeft } from "lucide-react";
 
 const Landing = () => {
   const navigate = useNavigate();
@@ -15,21 +16,32 @@ const Landing = () => {
         </span>
       </div>
 
-      <div className="flex-1 flex flex-col items-center justify-center px-6">
-        {/* Illustration placeholder */}
-        <div className="w-32 h-32 rounded-full bg-accent flex items-center justify-center mb-8">
-          <span className="text-5xl">🔄</span>
-        </div>
-
-        <h1 className="text-2xl font-bold text-foreground text-center mb-3">
+      <div className="flex-1 flex flex-col px-6 pt-8">
+        <h1 className="text-2xl font-bold text-foreground mb-2">
           External Balance Transfer
         </h1>
-        <p className="text-sm text-muted-foreground text-center leading-relaxed mb-2">
-          Consolidate your existing loans from other banks into one Axis Bank Personal Loan at a lower interest rate.
+        <p className="text-sm text-muted-foreground leading-relaxed mb-8">
+          Consolidate your existing loans from other banks into one Axis Bank Personal Loan for a lower interest rate.
         </p>
-        <p className="text-sm text-muted-foreground text-center leading-relaxed">
-          Save on EMIs, simplify repayments, and enjoy a hassle-free transfer process.
-        </p>
+
+        <h3 className="text-sm font-bold text-foreground tracking-wide mb-5">
+          HOW IT WORKS?
+        </h3>
+
+        <div className="space-y-5 mb-8">
+          <StepItem
+            icon={<CheckCircle2 size={22} className="text-primary" />}
+            text="Select the loans you want to close"
+          />
+          <StepItem
+            icon={<Banknote size={22} className="text-primary" />}
+            text="We pay loans directly to your lender"
+          />
+          <StepItem
+            icon={<ArrowRightLeft size={22} className="text-primary" />}
+            text="Your loans consolidate into one Axis Bank Personal Loan"
+          />
+        </div>
       </div>
 
       {/* Sticky CTA */}
@@ -38,11 +50,20 @@ const Landing = () => {
           onClick={() => navigate("/add-loan")}
           className="w-full bg-primary text-primary-foreground py-4 rounded-lg font-semibold text-base"
         >
-          Get Started
+          Okay
         </button>
       </div>
     </div>
   );
 };
+
+const StepItem = ({ icon, text }: { icon: React.ReactNode; text: string }) => (
+  <div className="flex items-start gap-4">
+    <div className="w-10 h-10 rounded-full bg-accent flex items-center justify-center shrink-0">
+      {icon}
+    </div>
+    <p className="text-sm text-foreground pt-2.5">{text}</p>
+  </div>
+);
 
 export default Landing;

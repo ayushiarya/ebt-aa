@@ -9,6 +9,7 @@ import LoanOffer from "./pages/LoanOffer";
 import MakePlan from "./pages/MakePlan";
 import ReviewLoan from "./pages/ReviewLoan";
 import OtpVerification from "./pages/OtpVerification";
+import ApplicationStatus from "./pages/ApplicationStatus";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/make-plan" element={<MakePlan />} />
           <Route path="/review" element={<ReviewLoan />} />
           <Route path="/otp" element={<OtpVerification />} />
+          <Route path="/status" element={<ApplicationStatus />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
