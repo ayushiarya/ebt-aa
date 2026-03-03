@@ -7,15 +7,8 @@ import { useLoan } from "@/context/LoanContext";
 
 const ReviewLoan = () => {
   const navigate = useNavigate();
-  const { loanAmount, tenure, emi, formatCurrency } = useLoan();
+  const { loanAmount, tenure, emi, formatCurrency, selectedLoans, totalOutstanding, processingFee, stampDuty, interestRate, netDisbursal } = useLoan();
   const [sheetOpen, setSheetOpen] = useState(false);
-
-  const processingFee = 4720;
-  const stampDuty = 410;
-  const interestRate = 16.5;
-  const prePmtCharges = 0;
-  const currentOutstanding = 200000;
-  const netDisbursal = loanAmount - processingFee - stampDuty - prePmtCharges - currentOutstanding;
 
   return (
     <div className="app-container min-h-screen flex flex-col bg-background page-enter">
@@ -23,33 +16,28 @@ const ReviewLoan = () => {
 
       <div className="flex-1 overflow-y-auto px-5 pt-5 pb-28">
         <h3 className="text-sm font-bold text-foreground mb-3 tracking-wide">Loan Summary</h3>
-
         <div className="bg-card border border-border rounded-2xl p-5 mb-5 space-y-4">
           <Row label="Merged Loan amount" value={formatCurrency(loanAmount)} icon />
           <Row label="New EMI Tenure" value={`${tenure} Months`} />
           <Row label="New EMI" value={formatCurrency(emi)} />
+          <Row label="Loans consolidated" value={`${selectedLoans.length}`} />
         </div>
 
         <h3 className="text-sm font-bold text-foreground mb-3 tracking-wide">Fees & Charges</h3>
-
         <div className="bg-card border border-border rounded-2xl p-5 mb-5 space-y-4">
           <Row label="Processing Fee (incl. of GST)" value={`- ${formatCurrency(processingFee)}`} />
           <Row label="Stamp Duty" value={`- ${formatCurrency(stampDuty)}`} />
           <Row label="Interest Rate" value={`${interestRate}% p.a.`} />
-          <Row label="Pre-Payment Charges" value={`- ${formatCurrency(prePmtCharges)}`} />
+          <Row label="Pre-Payment Charges" value={`- ${formatCurrency(0)}`} />
           <div className="border-t border-border pt-4">
             <div className="flex justify-between items-start">
               <div>
-                <span className="text-sm text-muted-foreground flex items-center gap-1">
-                  Current Outstanding <Info size={12} className="text-muted-foreground" />
-                </span>
-                <span className="text-xs text-muted-foreground">(existing loans (2))</span>
+                <span className="text-sm text-muted-foreground flex items-center gap-1">Current Outstanding <Info size={12} /></span>
+                <span className="text-xs text-muted-foreground">(existing loans ({selectedLoans.length}))</span>
               </div>
               <div className="text-right">
-                <span className="text-sm text-foreground font-medium block">- {formatCurrency(currentOutstanding)}</span>
-                <button onClick={() => setSheetOpen(true)} className="text-primary text-xs font-bold mt-1 active:opacity-70">
-                  VIEW BREAKUP
-                </button>
+                <span className="text-sm text-foreground font-medium block">- {formatCurrency(totalOutstanding)}</span>
+                <button onClick={() => setSheetOpen(true)} className="text-primary text-xs font-bold mt-1 active:opacity-70">VIEW BREAKUP</button>
               </div>
             </div>
           </div>
@@ -72,23 +60,19 @@ const ReviewLoan = () => {
       <BottomSheetModal open={sheetOpen} onClose={() => setSheetOpen(false)}>
         <h3 className="text-lg font-bold text-foreground mb-4">Current Outstanding Breakup</h3>
         <div className="space-y-3">
-          <div className="flex justify-between items-center text-sm">
-            <div>
-              <span className="text-foreground font-medium">HDFC Bank</span>
-              <span className="text-xs text-muted-foreground ml-2">Personal Loan</span>
+          {selectedLoans.map((loan) => (
+            <div key={loan.id} className="flex justify-between items-center text-sm">
+              <div>
+                <span className="text-foreground font-medium">{loan.bank}</span>
+                <span className="text-xs text-muted-foreground ml-2">{loan.type}</span>
+                {loan.source === "manual" && <span className="text-[10px] text-primary ml-1">(manual)</span>}
+              </div>
+              <span className="text-foreground font-medium">{formatCurrency(loan.outstanding)}</span>
             </div>
-            <span className="text-foreground font-medium">{formatCurrency(50000)}</span>
-          </div>
-          <div className="flex justify-between items-center text-sm">
-            <div>
-              <span className="text-foreground font-medium">ICICI Bank</span>
-              <span className="text-xs text-muted-foreground ml-2">Credit Card</span>
-            </div>
-            <span className="text-foreground font-medium">{formatCurrency(100000)}</span>
-          </div>
+          ))}
           <div className="border-t border-border pt-3 flex justify-between items-center">
             <span className="text-sm font-bold text-foreground">Total Outstanding</span>
-            <span className="text-sm font-bold text-primary">{formatCurrency(150000)}</span>
+            <span className="text-sm font-bold text-primary">{formatCurrency(totalOutstanding)}</span>
           </div>
         </div>
         <button onClick={() => setSheetOpen(false)} className="cta-primary mt-6">Okay</button>
