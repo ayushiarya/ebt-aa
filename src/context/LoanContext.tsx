@@ -77,7 +77,7 @@ export const LoanProvider = ({ children }: { children: ReactNode }) => {
   const [selectedLoans, setSelectedLoans] = useState<LoanEntry[]>([]);
   const [formData, setFormData] = useState<LoanFormData>(defaultFormData);
   const [editingLoan, setEditingLoan] = useState<LoanEntry | null>(null);
-  const [loanAmount, setLoanAmount] = useState(500000);
+  const [loanAmount, setLoanAmount] = useState(0);
   const [tenure, setTenure] = useState(18);
 
   const totalOutstanding = selectedLoans.reduce((s, l) => s + l.outstanding, 0);
