@@ -36,6 +36,10 @@ export interface LoanState {
   addManualLoan: (loan: LoanEntry) => void;
   updateLoan: (loan: LoanEntry) => void;
 
+  /** Bureau loan edits stored separately (before "Proceed") */
+  editedBureauLoans: Record<string, LoanEntry>;
+  updateBureauLoan: (loan: LoanEntry) => void;
+
   editingLoan: LoanEntry | null;
   setEditingLoan: (loan: LoanEntry | null) => void;
 
@@ -83,13 +87,13 @@ export const LoanProvider = ({ children }: { children: ReactNode }) => {
     useState<"ebt" | "new" | null>("ebt");
 
   const [selectedLoans, setSelectedLoans] = useState<LoanEntry[]>([]);
+  const [editedBureauLoans, setEditedBureauLoans] = useState<Record<string, LoanEntry>>({});
   const [formData, setFormData] = useState<LoanFormData>(defaultFormData);
   const [editingLoan, setEditingLoan] = useState<LoanEntry | null>(null);
 
   const [loanAmount, setLoanAmount] = useState(0);
   const [tenure, setTenure] = useState(18);
 
-  // 🔹 Derived values
   const totalOutstanding = selectedLoans.reduce(
     (s, l) => s + l.outstanding,
     0
@@ -112,7 +116,6 @@ export const LoanProvider = ({ children }: { children: ReactNode }) => {
   const stampDuty = 410;
   const interestRate = 11.49;
 
-  // ✅ Proper EMI formula
   const monthlyRate = interestRate / 100 / 12;
 
   const emi =
@@ -132,10 +135,16 @@ export const LoanProvider = ({ children }: { children: ReactNode }) => {
     setSelectedLoans((prev) => [...prev, loan]);
   };
 
+  /** Update a loan already in selectedLoans (post-Proceed edits or manual loans) */
   const updateLoan = (loan: LoanEntry) => {
     setSelectedLoans((prev) =>
       prev.map((l) => (l.id === loan.id ? loan : l))
     );
+  };
+
+  /** Store bureau loan edits before Proceed (bureau loans aren't in selectedLoans yet) */
+  const updateBureauLoan = (loan: LoanEntry) => {
+    setEditedBureauLoans((prev) => ({ ...prev, [loan.id]: loan }));
   };
 
   const formatCurrency = (n: number) =>
@@ -150,6 +159,8 @@ export const LoanProvider = ({ children }: { children: ReactNode }) => {
         setSelectedLoans,
         addManualLoan,
         updateLoan,
+        editedBureauLoans,
+        updateBureauLoan,
         editingLoan,
         setEditingLoan,
         formData,
