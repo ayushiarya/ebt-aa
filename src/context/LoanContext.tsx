@@ -100,12 +100,11 @@ export const LoanProvider = ({ children }: { children: ReactNode }) => {
     0
   );
 
-  // 🔥 OFFER GENERATION LOGIC (10% top-up)
+  // Offer = outstanding + 3L default top-up (ensures 2-3L headroom)
   useEffect(() => {
     if (totalOutstanding > 0) {
-      const topUp = Math.round(totalOutstanding * .46);
-      const generatedOffer = totalOutstanding + topUp;
-      setLoanAmount(generatedOffer);
+      const defaultTopUp = 300000;
+      setLoanAmount(totalOutstanding + defaultTopUp);
     }
   }, [totalOutstanding]);
 
