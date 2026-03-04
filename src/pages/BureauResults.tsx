@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import AppHeader from "@/components/AppHeader";
 import { ChevronRight, Plus, Pencil } from "lucide-react";
@@ -8,15 +8,35 @@ interface FetchedLoan extends LoanEntry {
   selected: boolean;
 }
 
-const BUREAU_LOANS: FetchedLoan[] = [
-  { id: "b1", bank: "HDFC Bank", type: "Personal Loan", accountNumber: "XXXX XXXX 4521", sanctionedAmount: 512500, outstanding: 350000, emi: 12500, rate: 14.5, emisPaid: 15, emisLeft: 30, source: "bureau", selected: true },
-  { id: "b2", bank: "ICICI Bank", type: "Credit Card", accountNumber: "XXXX XXXX 8832", sanctionedAmount: 200000, outstanding: 100000, emi: 5500, rate: 18.0, emisPaid: 10, emisLeft: 20, source: "bureau", selected: true },
+const INITIAL_BUREAU_LOANS: LoanEntry[] = [
+  { id: "b1", bank: "HDFC Bank", type: "Personal Loan", accountNumber: "XXXX XXXX 4521", sanctionedAmount: 512500, outstanding: 350000, emi: 12500, rate: 14.5, emisPaid: 15, emisLeft: 30, source: "bureau" },
+  { id: "b2", bank: "ICICI Bank", type: "Credit Card", accountNumber: "XXXX XXXX 8832", sanctionedAmount: 200000, outstanding: 100000, emi: 5500, rate: 18.0, emisPaid: 10, emisLeft: 20, source: "bureau" },
 ];
 
 const BureauResults = () => {
   const navigate = useNavigate();
   const { setSelectedLoans, selectedLoans, formatCurrency, setEditingLoan } = useLoan();
-  const [loans, setLoans] = useState<FetchedLoan[]>(BUREAU_LOANS);
+
+  // Build local list by merging INITIAL data with any context updates (from edits)
+  const buildLoans = useCallback((): FetchedLoan[] => {
+    return INITIAL_BUREAU_LOANS.map((initial) => {
+      // Check if this loan was already edited in context
+      const edited = selectedLoans.find((l) => l.id === initial.id);
+      return { ...(edited || initial), selected: true };
+    });
+  }, [selectedLoans]);
+
+  const [loans, setLoans] = useState<FetchedLoan[]>(buildLoans);
+
+  // Re-sync local state when returning from edit screen (selectedLoans changes)
+  useEffect(() => {
+    setLoans((prev) =>
+      prev.map((loan) => {
+        const updated = selectedLoans.find((l) => l.id === loan.id);
+        return updated ? { ...updated, selected: loan.selected } : loan;
+      })
+    );
+  }, [selectedLoans]);
 
   const toggleLoan = (id: string) => {
     setLoans((prev) => prev.map((l) => l.id === id ? { ...l, selected: !l.selected } : l));
@@ -137,7 +157,6 @@ const BureauResults = () => {
           <ChevronRight size={18} className="text-muted-foreground" />
         </button>
 
-        {/* Summary + CTA at bottom of scroll */}
         {(selected.length + manualLoans.length) > 0 && (
           <div className="flex justify-between items-center mb-3 mt-4">
             <span className="text-xs text-muted-foreground">
