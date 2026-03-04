@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronUp, ChevronDown, Info } from "lucide-react";
+import { ChevronUp, ChevronDown, Info, Lock } from "lucide-react";
 import AppHeader from "@/components/AppHeader";
 import BottomSheetModal from "@/components/BottomSheetModal";
 import { useLoan } from "@/context/LoanContext";
 
-const MAX_TOPUP = 200000;
+const MAX_TOPUP = 500000;
 
 const MakePlan = () => {
   const navigate = useNavigate();
@@ -29,7 +29,6 @@ const MakePlan = () => {
   const [sheetOpen, setSheetOpen] = useState(false);
 
   const baseOutstanding = totalOutstanding;
-
   const currentTopUp = Math.min(
     Math.max(loanAmount - baseOutstanding, 0),
     MAX_TOPUP
@@ -54,6 +53,24 @@ const MakePlan = () => {
           </div>
         </div>
 
+        {/* Takeover Amount (Fixed, non-adjustable) */}
+        <div className="bg-card border border-border rounded-2xl p-5 mb-4">
+          <div className="flex justify-between items-center">
+            <div>
+              <p className="text-sm font-medium text-foreground flex items-center gap-1.5">
+                Loan Takeover
+                <Lock size={13} className="text-muted-foreground" />
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Existing loans being transferred
+              </p>
+            </div>
+            <div className="bg-secondary rounded-xl px-4 py-2.5 text-sm font-bold text-foreground min-w-[100px] text-center">
+              {formatCurrency(baseOutstanding)}
+            </div>
+          </div>
+        </div>
+
         {/* Top-up Slider */}
         <div className="bg-card border border-border rounded-2xl p-5 mb-4">
           <div className="flex justify-between items-center mb-4">
@@ -62,25 +79,22 @@ const MakePlan = () => {
                 Top-up Amount
               </p>
               <p className="text-xs text-muted-foreground">
-                Existing takeover: {formatCurrency(baseOutstanding)}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                {interestRate}% p.a
+                Extra cash in your account
               </p>
             </div>
 
-            {/* 🔥 Show ONLY top-up amount */}
             <div className="border border-border rounded-xl px-4 py-2.5 text-sm font-bold text-foreground min-w-[100px] text-center">
               {formatCurrency(currentTopUp)}
             </div>
           </div>
 
           <div className="flex justify-between text-xs text-muted-foreground mb-2">
-            <span>0</span>
-            <span>50K</span>
+            <span>₹0</span>
             <span>1L</span>
-            <span>1.5L</span>
             <span>2L</span>
+            <span>3L</span>
+            <span>4L</span>
+            <span>5L</span>
           </div>
 
           <input
@@ -95,6 +109,12 @@ const MakePlan = () => {
             }}
             className="w-full"
           />
+        </div>
+
+        {/* Total Loan Amount */}
+        <div className="bg-accent/40 border border-primary/20 rounded-2xl p-4 mb-4 flex justify-between items-center">
+          <p className="text-sm font-medium text-foreground">Total Loan Amount</p>
+          <p className="text-base font-bold text-primary">{formatCurrency(loanAmount)}</p>
         </div>
 
         {/* Tenure */}
@@ -141,7 +161,9 @@ const MakePlan = () => {
 
           {expanded && (
             <div className="px-5 pb-5 border-t border-border pt-4 space-y-3">
-              <Row label="Loan amount" value={formatCurrency(loanAmount)} bold />
+              <Row label="Total Loan Amount" value={formatCurrency(loanAmount)} bold />
+              <Row label="  ↳ Takeover" value={formatCurrency(baseOutstanding)} />
+              <Row label="  ↳ Top-up" value={formatCurrency(currentTopUp)} />
               <Row
                 label="Processing fee (incl. of GST)"
                 value={`- ${formatCurrency(processingFee)}`}

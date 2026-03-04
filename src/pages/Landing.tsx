@@ -73,8 +73,8 @@ const Landing = () => {
             <p className="text-base font-bold text-foreground mt-1">External Balance Transfer</p>
             <p className="text-xs text-muted-foreground mt-1">Loan Offer</p>
             <div className="flex items-baseline gap-2 mt-1.5">
-              <span className="text-2xl font-bold text-foreground">₹5,00,000</span>
-              <span className="text-sm text-muted-foreground">@ 12% p.a.</span>
+              <span className="text-2xl font-bold text-foreground">₹7,50,000</span>
+              <span className="text-sm text-muted-foreground">@ 11.49% p.a.</span>
             </div>
             <div className="flex items-center gap-2 mt-3 text-xs text-muted-foreground">
               <span>Lower interest</span>
