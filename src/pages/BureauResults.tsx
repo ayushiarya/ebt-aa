@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AppHeader from "@/components/AppHeader";
 import { ChevronRight, Plus, Pencil } from "lucide-react";
@@ -15,28 +15,27 @@ const INITIAL_BUREAU_LOANS: LoanEntry[] = [
 
 const BureauResults = () => {
   const navigate = useNavigate();
-  const { setSelectedLoans, selectedLoans, formatCurrency, setEditingLoan } = useLoan();
+  const { setSelectedLoans, selectedLoans, formatCurrency, setEditingLoan, editedBureauLoans } = useLoan();
 
-  // Build local list by merging INITIAL data with any context updates (from edits)
-  const buildLoans = useCallback((): FetchedLoan[] => {
+  // Merge initial bureau data with any edits from context
+  const getBureauLoans = (): FetchedLoan[] => {
     return INITIAL_BUREAU_LOANS.map((initial) => {
-      // Check if this loan was already edited in context
-      const edited = selectedLoans.find((l) => l.id === initial.id);
+      const edited = editedBureauLoans[initial.id];
       return { ...(edited || initial), selected: true };
     });
-  }, [selectedLoans]);
+  };
 
-  const [loans, setLoans] = useState<FetchedLoan[]>(buildLoans);
+  const [loans, setLoans] = useState<FetchedLoan[]>(getBureauLoans);
 
-  // Re-sync local state when returning from edit screen (selectedLoans changes)
-  useEffect(() => {
-    setLoans((prev) =>
-      prev.map((loan) => {
-        const updated = selectedLoans.find((l) => l.id === loan.id);
-        return updated ? { ...updated, selected: loan.selected } : loan;
-      })
-    );
-  }, [selectedLoans]);
+  // Re-derive loans when editedBureauLoans changes (user returns from edit screen)
+  // We use a key approach: check if any edited loan differs from local state
+  const currentLoans = loans.map((loan) => {
+    const edited = editedBureauLoans[loan.id];
+    if (edited) {
+      return { ...edited, selected: loan.selected };
+    }
+    return loan;
+  });
 
   const toggleLoan = (id: string) => {
     setLoans((prev) => prev.map((l) => l.id === id ? { ...l, selected: !l.selected } : l));
@@ -49,7 +48,7 @@ const BureauResults = () => {
     navigate("/add-loan");
   };
 
-  const selected = loans.filter((l) => l.selected);
+  const selected = currentLoans.filter((l) => l.selected);
   const totalOutstanding = selected.reduce((s, l) => s + l.outstanding, 0);
   const manualLoans = selectedLoans.filter((l) => l.source === "manual");
 
@@ -68,7 +67,7 @@ const BureauResults = () => {
         <p className="text-xs text-muted-foreground mb-5">Select the loans you want to transfer to Axis Bank</p>
 
         <div className="space-y-3 mb-6">
-          {loans.map((loan) => (
+          {currentLoans.map((loan) => (
             <button key={loan.id} onClick={() => toggleLoan(loan.id)}
               className={`w-full text-left border-2 rounded-2xl p-5 transition-all active:scale-[0.99] ${
                 loan.selected ? "border-primary bg-accent/30" : "border-border bg-card"

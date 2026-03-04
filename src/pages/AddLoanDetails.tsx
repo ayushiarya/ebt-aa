@@ -11,7 +11,7 @@ const DOC_TYPES = ["Select", "Repayment + Bank Statement", "Loan Statement", "NO
 
 const AddLoanDetails = () => {
   const navigate = useNavigate();
-  const { formData, setFormData, addManualLoan, editingLoan, setEditingLoan, updateLoan } = useLoan();
+  const { formData, setFormData, addManualLoan, editingLoan, setEditingLoan, updateLoan, updateBureauLoan, selectedLoans } = useLoan();
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [repaymentFile, setRepaymentFile] = useState<UploadedFile | null>(null);
   const [bankStatementFile, setBankStatementFile] = useState<UploadedFile | null>(null);
@@ -77,7 +77,13 @@ const AddLoanDetails = () => {
     };
 
     if (isEditMode) {
-      updateLoan(loanData);
+      if (loanData.source === "bureau") {
+        // Bureau loans aren't in selectedLoans yet — store edit separately
+        updateBureauLoan(loanData);
+      } else {
+        // Manual loans are already in selectedLoans
+        updateLoan(loanData);
+      }
     } else {
       addManualLoan(loanData);
     }
@@ -193,7 +199,6 @@ const AddLoanDetails = () => {
           </div>
         )}
 
-        {/* CTA inside scroll */}
         <div className="mt-6 mb-4">
           <button onClick={handleSave} disabled={!isFormFilled} className="cta-primary">Save Details</button>
         </div>
