@@ -1,146 +1,84 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronUp, ChevronDown, Info } from "lucide-react";
 import AppHeader from "@/components/AppHeader";
-import BottomSheetModal from "@/components/BottomSheetModal";
 import { useLoan } from "@/context/LoanContext";
 
 const LoanOffer = () => {
   const navigate = useNavigate();
-  const { loanAmount, tenure, emi, formatCurrency, selectedLoans, totalOutstanding, processingFee, stampDuty, interestRate, netDisbursal, totalCurrentEmi } = useLoan();
-  const [expanded, setExpanded] = useState(false);
-  const [sheetOpen, setSheetOpen] = useState(false);
+  const { loanAmount, emi, formatCurrency, selectedLoans, totalCurrentEmi, interestRate, tenure } = useLoan();
 
   const savings = totalCurrentEmi - emi;
+  const savingsPercent = totalCurrentEmi > 0 ? Math.round((savings / totalCurrentEmi) * 100) : 0;
+  const avgCurrentRate = selectedLoans.length > 0
+    ? (selectedLoans.reduce((s, l) => s + l.rate, 0) / selectedLoans.length)
+    : 0;
+  const rateDiff = avgCurrentRate - interestRate;
 
   return (
     <div className="app-container min-h-screen flex flex-col bg-background page-enter">
       <AppHeader title="Loan Offer" showBack />
 
       <div className="flex-1 overflow-y-auto px-5 pt-5 pb-5">
-        {/* Savings */}
+        {/* Savings card */}
         {savings > 0 && (
           <div className="bg-accent rounded-2xl p-5 mb-5">
-            <p className="text-xs text-muted-foreground mb-1 tracking-wide">YOU COULD SAVE</p>
+            <p className="text-[10px] text-muted-foreground tracking-wider mb-1">YOU COULD SAVE</p>
             <p className="text-xl font-bold text-primary">{formatCurrency(savings)}/month*</p>
-            <p className="text-xs text-muted-foreground">Reduction in monthly EMI</p>
-            <p className="text-[10px] text-muted-foreground mt-2 italic">*Assumes max 48 months tenure. Final values may vary.</p>
+            <p className="text-xs font-semibold text-foreground">{savingsPercent}% reduction in monthly EMI</p>
+            <p className="text-[10px] text-muted-foreground mt-2 italic">
+              *This calculation assumes a maximum 72 months tenure. But final values may vary with the chosen tenure.
+            </p>
           </div>
         )}
 
-        {/* Offer */}
-        <div className="bg-card border-2 border-primary rounded-2xl p-5 mb-5">
+        {/* Revised offer */}
+        <div className="bg-accent/30 border-2 border-primary rounded-2xl p-5 mb-5">
           <p className="text-xs text-muted-foreground mb-1">You have a revised loan offer of</p>
-          <p className="text-2xl font-bold text-foreground">{formatCurrency(loanAmount)}</p>
-          <p className="text-xs text-muted-foreground">@{interestRate}% p.a. • Lower than current rate</p>
+          <p className="text-2xl font-bold text-primary">{formatCurrency(loanAmount)}</p>
+          <div className="flex items-center gap-2 mt-1">
+            <span className="text-xs text-muted-foreground">@{interestRate}% p.a.</span>
+            {rateDiff > 0 && (
+              <span className="text-xs text-green-600 font-semibold">+ {rateDiff.toFixed(1)}% lower than current</span>
+            )}
+          </div>
         </div>
 
-        {/* EMI Plan */}
-        <p className="text-sm font-bold text-foreground mb-3 tracking-wide">SELECT EMI PLAN</p>
+        {/* Select EMI Plan */}
+        <p className="text-sm font-bold text-foreground mb-3 tracking-wide text-center">SELECT EMI PLAN</p>
         <div className="flex gap-3 mb-5">
-          <div className="flex-1 border-2 border-primary rounded-2xl p-4 bg-accent/30">
-            <span className="text-[10px] bg-primary text-primary-foreground px-2.5 py-1 rounded-full font-semibold">Popular</span>
+          <div className="flex-1 border-2 border-primary rounded-2xl p-4 bg-accent/30 relative">
+            <span className="absolute -top-2.5 left-3 text-[10px] bg-primary text-primary-foreground px-2.5 py-0.5 rounded-full font-semibold">Popular</span>
             <p className="text-lg font-bold text-foreground mt-2">{formatCurrency(emi)}</p>
             <p className="text-xs text-muted-foreground">× {tenure} months</p>
           </div>
           <button onClick={() => navigate("/make-plan")}
             className="flex-1 border-2 border-border rounded-2xl p-4 flex items-center justify-center active:bg-accent/20 transition-colors">
-            <span className="text-sm text-primary font-semibold">Make your plan →</span>
+            <span className="text-sm text-primary font-semibold">Make your<br />plan</span>
           </button>
         </div>
 
-        {/* Loans transferred */}
-        <p className="text-sm font-bold text-foreground mb-3">Loans Being Transferred ({selectedLoans.length})</p>
-        <div className="bg-card border border-border rounded-2xl p-5 mb-5 space-y-3">
+        {/* Loans Being Closed */}
+        <p className="text-sm font-bold text-foreground mb-3">Loans Being Closed ({selectedLoans.length})</p>
+        <div className="bg-card border border-border rounded-2xl p-4 mb-5 space-y-3">
           {selectedLoans.map((loan) => (
             <div key={loan.id} className="flex justify-between items-center text-sm">
               <div>
                 <span className="text-foreground font-medium">{loan.bank}</span>
-                <span className="text-xs text-muted-foreground ml-2">· {loan.type}</span>
-              </div>
-              <span className="text-foreground">{formatCurrency(loan.outstanding)}</span>
-            </div>
-          ))}
-          <div className="border-t border-border pt-3 flex justify-between items-center text-sm font-bold">
-            <span className="text-foreground">Total Outstanding</span>
-            <span className="text-foreground">{formatCurrency(totalOutstanding)}</span>
-          </div>
-        </div>
-
-        {/* Expandable */}
-        <div className="border border-border rounded-2xl overflow-hidden mb-5">
-          <button onClick={() => setExpanded(!expanded)}
-            className="w-full flex justify-between items-center p-5 active:bg-secondary/50">
-            <span className="text-sm font-medium text-foreground">How is my Net Disbursal calculated?</span>
-            {expanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-          </button>
-          {expanded && (
-            <div className="px-5 pb-5 border-t border-border pt-4 space-y-3">
-              <Row label="Loan amount" value={formatCurrency(loanAmount)} />
-              <Row label="Processing fee (incl. GST)" value={`- ${formatCurrency(processingFee)}`} />
-              <Row label="Stamp duty" value={`- ${formatCurrency(stampDuty)}`} />
-              <Row label="Interest rate" value={`${interestRate}% pa`} />
-              <div className="border-t border-border pt-3">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <span className="text-sm text-muted-foreground flex items-center gap-1">Current Outstanding <Info size={12} /></span>
-                    <span className="text-xs text-muted-foreground">(existing loans ({selectedLoans.length}))</span>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-sm text-foreground block">-{formatCurrency(totalOutstanding)}</span>
-                    <button onClick={() => setSheetOpen(true)} className="text-primary text-xs font-bold mt-1 active:opacity-70">VIEW BREAKUP</button>
-                  </div>
-                </div>
-              </div>
-              <div className="border-t border-border pt-3">
-                <Row label="Net disbursal*" value={formatCurrency(netDisbursal)} bold />
-              </div>
-            </div>
-          )}
-        </div>
-        <p className="text-xs text-muted-foreground mb-5">*Net Disbursal is the amount credited to your account after deductions.</p>
-
-        {/* CTA */}
-        <div className="flex items-center justify-between border-t border-border pt-4 mb-4">
-          <div>
-            <p className="text-xs text-muted-foreground font-medium tracking-wide">NET DISBURSAL</p>
-            <p className="text-xl font-bold text-foreground">{formatCurrency(netDisbursal)}</p>
-          </div>
-          <button onClick={() => navigate("/make-plan")}
-            className="bg-primary text-primary-foreground px-8 py-3.5 rounded-xl font-semibold text-sm active:scale-[0.97] transition-transform shadow-md">
-            Continue
-          </button>
-        </div>
-      </div>
-
-      <BottomSheetModal open={sheetOpen} onClose={() => setSheetOpen(false)}>
-        <h3 className="text-lg font-bold text-foreground mb-4">Current Outstanding Breakup</h3>
-        <div className="space-y-3">
-          {selectedLoans.map((loan) => (
-            <div key={loan.id} className="flex justify-between items-center text-sm">
-              <div>
-                <span className="text-foreground font-medium">{loan.bank}</span>
-                <span className="text-xs text-muted-foreground ml-2">{loan.type}</span>
+                <p className="text-[10px] text-muted-foreground">
+                  Current EMI: {formatCurrency(loan.emi)} @ {loan.rate}%
+                </p>
               </div>
               <span className="text-foreground font-medium">{formatCurrency(loan.outstanding)}</span>
             </div>
           ))}
-          <div className="border-t border-border pt-3 flex justify-between items-center">
-            <span className="text-sm font-bold text-foreground">Total Outstanding</span>
-            <span className="text-sm font-bold text-primary">{formatCurrency(totalOutstanding)}</span>
-          </div>
         </div>
-        <button onClick={() => setSheetOpen(false)} className="cta-primary mt-6">Okay</button>
-      </BottomSheetModal>
+
+        {/* CTA */}
+        <button onClick={() => navigate("/make-plan")} className="cta-primary mb-4">
+          Proceed
+        </button>
+      </div>
     </div>
   );
 };
-
-const Row = ({ label, value, bold }: { label: string; value: string; bold?: boolean }) => (
-  <div className="flex justify-between items-center">
-    <span className={`text-sm ${bold ? "font-bold text-foreground" : "text-muted-foreground"}`}>{label}</span>
-    <span className={`text-sm ${bold ? "font-bold text-foreground" : "text-foreground"}`}>{value}</span>
-  </div>
-);
 
 export default LoanOffer;

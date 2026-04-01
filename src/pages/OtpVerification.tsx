@@ -40,7 +40,7 @@ const OtpVerification = () => {
           <div className="w-11 h-11 bg-muted rounded-xl flex items-center justify-center">
             <span className="text-muted-foreground text-base">🔒</span>
           </div>
-          <span className="text-foreground font-medium text-base">+91 88XXXXXX25</span>
+          <span className="text-foreground font-medium text-base">+91 8820536325</span>
         </div>
 
         <div className="flex gap-3 mb-6">
@@ -60,13 +60,12 @@ const OtpVerification = () => {
           RESEND OTP
         </button>
 
-        {/* CTA inside scroll */}
         <button
-          onClick={() => allFilled && navigate("/status")}
+          onClick={() => allFilled && navigate("/submitted")}
           disabled={!allFilled}
           className="cta-primary mb-4"
         >
-          Submit
+          Confirm OTP
         </button>
       </div>
     </div>

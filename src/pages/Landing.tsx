@@ -1,11 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Menu, Home, ChevronRight } from "lucide-react";
-import { useLoan } from "@/context/LoanContext";
+import { Menu, Home } from "lucide-react";
 
 const Landing = () => {
   const navigate = useNavigate();
-  const { selectedLoanType, setSelectedLoanType } = useLoan();
   const [checks, setChecks] = useState([false, false, false]);
 
   const toggleCheck = (i: number) => {
@@ -41,79 +39,63 @@ const Landing = () => {
         {/* Banner */}
         <div className="bg-accent mx-4 mt-4 rounded-2xl p-5 flex items-center gap-3">
           <div className="flex-1">
-            <p className="text-base font-bold text-foreground">Congratulations!</p>
-            <p className="text-sm text-foreground mt-0.5">
-              Your <span className="text-primary font-bold italic">pre-qualified loan</span>
+            <p className="text-sm font-bold text-foreground leading-snug">
+              Close your existing personal loans and switch to Axis Bank
             </p>
-            <p className="text-sm text-foreground font-bold italic">options are ready</p>
-            <p className="text-xs text-muted-foreground mt-1.5">Choose what works best for you.</p>
+            <p className="text-sm font-bold text-primary">at a lower interest rate</p>
           </div>
-          <div className="w-20 h-20 flex items-center justify-center shrink-0">
-            <span className="text-4xl">💰</span>
+          <div className="w-16 h-16 flex items-center justify-center shrink-0">
+            <span className="text-3xl">💰</span>
           </div>
         </div>
 
-        {/* Section header */}
-        <div className="px-4 mt-6 flex items-center justify-between">
-          <h2 className="text-base font-semibold text-foreground">Select loan type</h2>
-          <button className="text-primary text-sm font-bold tracking-wide active:opacity-70">COMPARE</button>
+        {/* Offer headline */}
+        <div className="px-4 mt-4">
+          <p className="text-xs text-muted-foreground">Loan Offer up to</p>
+          <div className="flex items-baseline gap-2 mt-0.5">
+            <span className="text-2xl font-bold text-foreground">₹40,00,000</span>
+            <span className="text-sm text-muted-foreground">@ 12% p.a.</span>
+          </div>
         </div>
 
-        {/* EBT Card */}
-        <div className="px-4 mt-3">
-          <button
-            onClick={() => setSelectedLoanType("ebt")}
-            className={`w-full text-left border-2 rounded-2xl p-5 transition-all relative active:scale-[0.99] ${
-              selectedLoanType === "ebt" ? "border-primary bg-accent/30" : "border-border bg-card"
-            }`}
-          >
-            <span className="absolute -top-2.5 left-4 bg-primary text-primary-foreground text-[10px] font-bold px-3 py-0.5 rounded tracking-wider">
-              POPULAR
-            </span>
-            <p className="text-base font-bold text-foreground mt-1">External Balance Transfer</p>
-            <p className="text-xs text-muted-foreground mt-1">Loan Offer</p>
-            <div className="flex items-baseline gap-2 mt-1.5">
-              <span className="text-2xl font-bold text-foreground">₹7,50,000</span>
-              <span className="text-sm text-muted-foreground">@ 11.49% p.a.</span>
+        {/* 3 Benefit icons */}
+        <div className="px-4 mt-5 flex gap-4">
+          {[
+            { icon: "📅", label: "Flexible tenure\nup to 84 months" },
+            { icon: "📉", label: "Lower\nmonthly EMI" },
+            { icon: "💵", label: "Extra funds\nafter closing loans" },
+          ].map((b, i) => (
+            <div key={i} className="flex-1 flex flex-col items-center text-center gap-2">
+              <div className="w-12 h-12 bg-accent rounded-full flex items-center justify-center">
+                <span className="text-xl">{b.icon}</span>
+              </div>
+              <p className="text-[11px] text-muted-foreground leading-tight whitespace-pre-line">{b.label}</p>
             </div>
-            <div className="flex items-center gap-2 mt-3 text-xs text-muted-foreground">
-              <span>Lower interest</span>
-              <span>·</span>
-              <span>One loan, one EMI</span>
-              <span>·</span>
-              <span>No extra cost</span>
-            </div>
-          </button>
+          ))}
         </div>
 
-        {/* New Loan Card */}
-        <div className="px-4 mt-3">
-          <button
-            onClick={() => setSelectedLoanType("new")}
-            className={`w-full text-left border-2 rounded-2xl p-5 transition-all active:scale-[0.99] ${
-              selectedLoanType === "new" ? "border-primary bg-accent/30" : "border-border bg-card"
-            }`}
-          >
-            <p className="text-base font-bold text-foreground">New Loan</p>
-            <p className="text-xs text-muted-foreground mt-1">Loan Offer</p>
-            <div className="flex items-baseline gap-2 mt-1.5">
-              <span className="text-2xl font-bold text-foreground">₹3,00,000</span>
-              <span className="text-sm text-muted-foreground">@ 14.5% p.a.</span>
-            </div>
-          </button>
-        </div>
-
-        {/* Learn link */}
+        {/* Three steps */}
         <div className="px-4 mt-6">
-          <button className="flex items-center gap-2.5 text-sm text-foreground active:opacity-70 py-2">
-            <span className="text-lg">📘</span>
-            <span>Learn how External Balance Transfer works</span>
-            <ChevronRight size={16} className="text-primary" />
-          </button>
+          <p className="text-lg font-bold text-foreground">Three steps.</p>
+          <p className="text-lg font-bold text-foreground">One better loan.</p>
+        </div>
+
+        <div className="px-4 mt-4 flex gap-3">
+          {[
+            { num: "01", title: "Pick loans to close", desc: "Choose which active personal loans you want to close" },
+            { num: "02", title: "We pay them off", desc: "We issue a demand draft to your lenders to close those loans" },
+            { num: "03", title: "Enjoy the benefits", desc: "Lower EMI, extra funds & one simple loan" },
+          ].map((step, i) => (
+            <div key={i} className="flex-1 bg-card border border-border rounded-xl p-3">
+              <p className="text-lg font-bold text-primary mb-1">{step.num}</p>
+              <p className="text-xs font-semibold text-foreground mb-1">{step.title}</p>
+              <p className="text-[10px] text-muted-foreground leading-snug">{step.desc}</p>
+            </div>
+          ))}
         </div>
 
         {/* Consent checkboxes */}
-        <div className="px-4 mt-5 space-y-5">
+        <div className="px-4 mt-6 space-y-5">
           {[
             <>I confirm that my <span className="text-primary font-semibold">household income</span> is above ₹3,00,000 per annum.</>,
             <>I am an Indian citizen and pay taxes only in India.</>,
@@ -130,11 +112,11 @@ const Landing = () => {
           ))}
         </div>
 
-        {/* CTA inside scroll */}
+        {/* CTA */}
         <div className="px-5 mt-6">
           <button
-            onClick={() => allChecked && selectedLoanType && navigate("/bureau-loader")}
-            disabled={!allChecked || !selectedLoanType}
+            onClick={() => allChecked && navigate("/bureau-loader")}
+            disabled={!allChecked}
             className="cta-primary"
           >
             Proceed
