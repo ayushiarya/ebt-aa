@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import AppHeader from "@/components/AppHeader";
 import { Info, Eye, Trash2, Upload } from "lucide-react";
-import { useLoan } from "@/context/LoanContext";
+import { useLoan, LoanEntry } from "@/context/LoanContext";
 
 interface UploadedFile { name: string; size: string; }
 

@@ -37,7 +37,7 @@ const LoanOffer = () => {
           <div className="flex items-center gap-2 mt-1">
             <span className="text-xs text-muted-foreground">@{interestRate}% p.a.</span>
             {rateDiff > 0 && (
-              <span className="text-xs text-green-600 font-semibold">+ {rateDiff.toFixed(1)}% lower than current</span>
+              <span className="text-xs font-semibold" style={{ color: "hsl(var(--success))" }}>+ {rateDiff.toFixed(1)}% lower than current</span>
             )}
           </div>
         </div>

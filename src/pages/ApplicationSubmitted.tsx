@@ -42,7 +42,7 @@ const ApplicationSubmitted = () => {
           {/* Step 1 - Submitted */}
           <div className="flex gap-3">
             <div className="flex flex-col items-center">
-              <CheckCircle size={20} className="text-green-600" />
+              <CheckCircle size={20} className="text-primary" />
               <div className="w-0.5 h-12 bg-border" />
             </div>
             <div className="pb-4">
