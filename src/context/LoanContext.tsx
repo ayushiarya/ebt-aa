@@ -11,7 +11,10 @@ export interface LoanEntry {
   rate: number;
   emisPaid: number;
   emisLeft: number;
+  loanStartDate: string;
   source: "bureau" | "manual";
+  verified: boolean;
+  soaFile?: { name: string; size: string } | null;
 }
 
 export interface LoanFormData {
@@ -28,15 +31,11 @@ export interface LoanFormData {
 }
 
 export interface LoanState {
-  selectedLoanType: "ebt" | "new" | null;
-  setSelectedLoanType: (t: "ebt" | "new" | null) => void;
-
   selectedLoans: LoanEntry[];
   setSelectedLoans: (loans: LoanEntry[]) => void;
   addManualLoan: (loan: LoanEntry) => void;
   updateLoan: (loan: LoanEntry) => void;
 
-  /** Bureau loan edits stored separately (before "Proceed") */
   editedBureauLoans: Record<string, LoanEntry>;
   updateBureauLoan: (loan: LoanEntry) => void;
 
@@ -51,6 +50,9 @@ export interface LoanState {
   tenure: number;
   setTenure: (n: number) => void;
 
+  selectedLoanCentre: { name: string; code: string; address: string } | null;
+  setSelectedLoanCentre: (c: { name: string; code: string; address: string } | null) => void;
+
   emi: number;
   totalOutstanding: number;
   totalCurrentEmi: number;
@@ -58,6 +60,7 @@ export interface LoanState {
   stampDuty: number;
   interestRate: number;
   netDisbursal: number;
+  maxLoanAmount: number;
   formatCurrency: (n: number) => string;
 }
 
@@ -83,78 +86,61 @@ export const useLoan = () => {
 };
 
 export const LoanProvider = ({ children }: { children: ReactNode }) => {
-  const [selectedLoanType, setSelectedLoanType] =
-    useState<"ebt" | "new" | null>("ebt");
-
   const [selectedLoans, setSelectedLoans] = useState<LoanEntry[]>([]);
   const [editedBureauLoans, setEditedBureauLoans] = useState<Record<string, LoanEntry>>({});
   const [formData, setFormData] = useState<LoanFormData>(defaultFormData);
   const [editingLoan, setEditingLoan] = useState<LoanEntry | null>(null);
+  const [selectedLoanCentre, setSelectedLoanCentre] = useState<{ name: string; code: string; address: string } | null>({
+    name: "Mulund",
+    code: "UTIB0000108",
+    address: "Park Apartments, Saki Naka, MIDC, Andheri East, Near Techno Park, Mumbai 400072",
+  });
 
-  const [loanAmount, setLoanAmount] = useState(0);
-  const [tenure, setTenure] = useState(18);
+  const maxLoanAmount = 4000000;
+  const [loanAmount, setLoanAmount] = useState(maxLoanAmount);
+  const [tenure, setTenure] = useState(48);
 
-  const totalOutstanding = selectedLoans.reduce(
-    (s, l) => s + l.outstanding,
-    0
-  );
+  const totalOutstanding = selectedLoans.reduce((s, l) => s + l.outstanding, 0);
+  const totalCurrentEmi = selectedLoans.reduce((s, l) => s + l.emi, 0);
 
-  const totalCurrentEmi = selectedLoans.reduce(
-    (s, l) => s + l.emi,
-    0
-  );
-
-  // Offer = outstanding + 3L default top-up (ensures 2-3L headroom)
   useEffect(() => {
-    if (totalOutstanding > 0) {
-      const defaultTopUp = 300000;
-      setLoanAmount(totalOutstanding + defaultTopUp);
+    if (totalOutstanding > 0 && loanAmount < totalOutstanding) {
+      setLoanAmount(Math.min(totalOutstanding + 300000, maxLoanAmount));
     }
   }, [totalOutstanding]);
 
-  const processingFee = Math.round(loanAmount * 0.0118);
-  const stampDuty = 410;
-  const interestRate = 11.49;
+  const processingFee = 5899;
+  const stampDuty = 9500;
+  const interestRate = 12;
 
   const monthlyRate = interestRate / 100 / 12;
-
   const emi =
     loanAmount > 0
       ? Math.round(
-          (loanAmount *
-            monthlyRate *
-            Math.pow(1 + monthlyRate, tenure)) /
+          (loanAmount * monthlyRate * Math.pow(1 + monthlyRate, tenure)) /
             (Math.pow(1 + monthlyRate, tenure) - 1)
         )
       : 0;
 
-  const netDisbursal =
-    loanAmount - processingFee - stampDuty - totalOutstanding;
+  const netDisbursal = loanAmount - processingFee - stampDuty - totalOutstanding;
 
   const addManualLoan = (loan: LoanEntry) => {
     setSelectedLoans((prev) => [...prev, loan]);
   };
 
-  /** Update a loan already in selectedLoans (post-Proceed edits or manual loans) */
   const updateLoan = (loan: LoanEntry) => {
-    setSelectedLoans((prev) =>
-      prev.map((l) => (l.id === loan.id ? loan : l))
-    );
+    setSelectedLoans((prev) => prev.map((l) => (l.id === loan.id ? loan : l)));
   };
 
-  /** Store bureau loan edits before Proceed (bureau loans aren't in selectedLoans yet) */
   const updateBureauLoan = (loan: LoanEntry) => {
     setEditedBureauLoans((prev) => ({ ...prev, [loan.id]: loan }));
   };
 
-  const formatCurrency = (n: number) =>
-    "₹" + n.toLocaleString("en-IN");
+  const formatCurrency = (n: number) => "₹" + n.toLocaleString("en-IN");
 
   return (
     <LoanContext.Provider
       value={{
-        selectedLoanType,
-        setSelectedLoanType,
         selectedLoans,
         setSelectedLoans,
         addManualLoan,
@@ -169,6 +155,8 @@ export const LoanProvider = ({ children }: { children: ReactNode }) => {
         setLoanAmount,
         tenure,
         setTenure,
+        selectedLoanCentre,
+        setSelectedLoanCentre,
         emi,
         totalOutstanding,
         totalCurrentEmi,
@@ -176,6 +164,7 @@ export const LoanProvider = ({ children }: { children: ReactNode }) => {
         stampDuty,
         interestRate,
         netDisbursal,
+        maxLoanAmount,
         formatCurrency,
       }}
     >

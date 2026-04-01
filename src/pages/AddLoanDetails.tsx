@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import AppHeader from "@/components/AppHeader";
 import { Info, Eye, Trash2, Upload } from "lucide-react";
-import { useLoan } from "@/context/LoanContext";
+import { useLoan, LoanEntry } from "@/context/LoanContext";
 
 interface UploadedFile { name: string; size: string; }
 
@@ -62,7 +62,7 @@ const AddLoanDetails = () => {
     setSubmitted(true);
     if (!validate()) return;
 
-    const loanData = {
+    const loanData: LoanEntry = {
       id: isEditMode ? editingLoan!.id : "m_" + Date.now(),
       bank: formData.bankName,
       type: formData.loanType === "personal" ? "Personal Loan" : "Credit Card",
@@ -73,7 +73,10 @@ const AddLoanDetails = () => {
       rate: parseFloat(formData.interestRate.replace(/[^\d.]/g, "")) || 0,
       emisPaid: parseInt(formData.emisPaid) || 0,
       emisLeft: parseInt(formData.emisLeft) || 0,
+      loanStartDate: isEditMode ? editingLoan!.loanStartDate : new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }),
       source: (isEditMode ? editingLoan!.source : "manual") as "bureau" | "manual",
+      verified: isEditMode ? editingLoan!.verified : true,
+      soaFile: isEditMode ? editingLoan!.soaFile : null,
     };
 
     if (isEditMode) {
