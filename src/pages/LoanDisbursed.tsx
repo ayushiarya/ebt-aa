@@ -27,7 +27,7 @@ const LoanDisbursed = () => {
           <p className="text-[10px] text-primary tracking-wider font-bold mb-1">CONGRATULATIONS</p>
           <h2 className="text-lg font-bold text-primary mb-1">Your loan is disbursed</h2>
           <p className="text-sm text-muted-foreground">
-            {formatCurrency(netDisbursal)} has been credited to your account
+            {formatCurrency(netDisbursal)} has been credited to your account ending **** 0808
           </p>
         </div>
 
