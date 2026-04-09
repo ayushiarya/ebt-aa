@@ -1,8 +1,10 @@
 import { useNavigate } from "react-router-dom";
-import { CheckCircle, Clock, MapPin, Copy } from "lucide-react";
+import { CheckCircle, Clock, Copy } from "lucide-react";
+import { useLoan } from "@/context/LoanContext";
 
 const ApplicationSubmitted = () => {
   const navigate = useNavigate();
+  const { ddOption } = useLoan();
   const appId = "MLP000001029055";
 
   return (
@@ -51,29 +53,41 @@ const ApplicationSubmitted = () => {
             </div>
           </div>
 
-          {/* Step 2 - Under review */}
+          {/* Step 2 - Reviewing */}
           <div className="flex gap-3">
             <div className="flex flex-col items-center">
               <Clock size={20} className="text-primary" />
               <div className="w-0.5 h-12 bg-border" />
             </div>
             <div className="pb-4">
-              <p className="text-sm font-semibold text-foreground">Application under review</p>
-              <p className="text-xs text-muted-foreground">We're verifying your details. This usually takes 24-48 hours.</p>
+              <p className="text-sm font-semibold text-foreground">Reviewing Application</p>
+              <p className="text-xs text-muted-foreground">We are verifying your details. This usually takes 24-48 hours.</p>
             </div>
           </div>
 
-          {/* Step 3 - Collect DD */}
+          {/* Step 3 - Loan Disbursed */}
           <div className="flex gap-3">
             <div className="flex flex-col items-center">
               <div className="w-5 h-5 rounded-full border-2 border-border bg-background flex items-center justify-center">
                 <span className="text-[10px] text-muted-foreground">3</span>
               </div>
+              <div className="w-0.5 h-12 bg-border" />
+            </div>
+            <div className="pb-4">
+              <p className="text-sm font-semibold text-foreground">Loan Disbursed</p>
+            </div>
+          </div>
+
+          {/* Step 4 - DD step (conditional) */}
+          <div className="flex gap-3">
+            <div className="flex flex-col items-center">
+              <div className="w-5 h-5 rounded-full border-2 border-border bg-background flex items-center justify-center">
+                <span className="text-[10px] text-muted-foreground">4</span>
+              </div>
             </div>
             <div>
-              <p className="text-sm font-semibold text-foreground">Collect demand draft</p>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                Visit your selected Axis Bank loan centre, collect the Demand Draft, and submit it to your lender to close your loan.
+              <p className="text-sm font-semibold text-foreground">
+                {ddOption === "home" ? "Demand draft home delivery" : "Collect demand draft"}
               </p>
             </div>
           </div>
