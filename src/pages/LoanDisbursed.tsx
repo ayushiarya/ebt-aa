@@ -5,7 +5,7 @@ import { useLoan } from "@/context/LoanContext";
 
 const LoanDisbursed = () => {
   const navigate = useNavigate();
-  const { formatCurrency, netDisbursal, emi, tenure, selectedLoanCentre, ddOption } = useLoan();
+  const { formatCurrency, netDisbursal, emi, tenure, selectedLoanCentre, ddOption, loanAmount, processingFee, stampDuty } = useLoan();
   const [breakupOpen, setBreakupOpen] = useState(false);
   const appId = "MLP000001029055";
 
@@ -124,7 +124,7 @@ const LoanDisbursed = () => {
         {/* Net Disbursal Card */}
         <div className="border border-border rounded-2xl p-5 mb-5 text-center">
           <p className="text-[10px] text-muted-foreground tracking-wider mb-1">NET DISBURSAL</p>
-          <p className="text-2xl font-bold text-foreground mb-1">{formatCurrency(netDisbursal)}</p>
+          <p className="text-2xl font-bold text-foreground mb-1">{formatCurrency(loanAmount - processingFee - stampDuty)}</p>
           <p className="text-[10px] text-muted-foreground">Application ID: {appId}</p>
 
           <div className="flex justify-center gap-8 mt-4">
@@ -136,6 +136,10 @@ const LoanDisbursed = () => {
               <p className="text-[10px] text-muted-foreground">EMI STARTS</p>
               <p className="text-xs font-bold text-foreground">4 March, 2026</p>
             </div>
+          </div>
+          <div className="text-center mt-3">
+            <p className="text-[10px] text-muted-foreground">DISBURSAL & EMI ACCOUNT</p>
+            <p className="text-xs font-bold text-foreground">Axis Bank 9090 **** 0808</p>
           </div>
         </div>
 

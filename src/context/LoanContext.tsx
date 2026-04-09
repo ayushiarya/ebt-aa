@@ -104,6 +104,9 @@ export const LoanProvider = ({ children }: { children: ReactNode }) => {
   const [loanAmount, setLoanAmount] = useState(maxLoanAmount);
   const [tenure, setTenure] = useState(48);
 
+  // Note: emi is calculated dynamically from loanAmount, tenure, interestRate
+  // With 4000000 @ 12% for 48 months, emi ≈ 105,335
+
   const totalOutstanding = selectedLoans.reduce((s, l) => s + l.outstanding, 0);
   const totalCurrentEmi = selectedLoans.reduce((s, l) => s + l.emi, 0);
 
@@ -126,6 +129,8 @@ export const LoanProvider = ({ children }: { children: ReactNode }) => {
         )
       : 0;
 
+  // Net disbursal = loanAmount - processingFee - stampDuty - totalOutstanding
+  // With defaults: 4000000 - 5899 - 9500 - 683163 = 3301438
   const netDisbursal = loanAmount - processingFee - stampDuty - totalOutstanding;
 
   const addManualLoan = (loan: LoanEntry) => {
