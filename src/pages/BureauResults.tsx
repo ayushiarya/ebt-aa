@@ -6,8 +6,8 @@ import { useLoan, LoanEntry } from "@/context/LoanContext";
 import BottomSheetModal from "@/components/BottomSheetModal";
 
 const INITIAL_BUREAU_LOANS: LoanEntry[] = [
-  { id: "b1", bank: "HDFC Bank", type: "Personal Loan", accountNumber: "12345678901234567890", sanctionedAmount: 2000000, outstanding: 903900, emi: 57165, rate: 16.5, emisPaid: 28, emisLeft: 17, loanStartDate: "24 Nov 2023", source: "bureau", verified: false, soaFile: null },
-  { id: "b2", bank: "ICICI Bank", type: "Personal Loan", accountNumber: "98765432101234567890", sanctionedAmount: 2000000, outstanding: 1163800, emi: 57165, rate: 16.5, emisPaid: 15, emisLeft: 30, loanStartDate: "06 May 2024", source: "bureau", verified: false, soaFile: null },
+  { id: "b1", bank: "HDFC Bank", type: "Personal Loan", accountNumber: "12345678901234567890", sanctionedAmount: 550000, outstanding: 454659, emi: 15724, rate: 16.5, emisPaid: 20, emisLeft: 28, loanStartDate: "15 Jul 2024", source: "bureau", verified: false, soaFile: null },
+  { id: "b2", bank: "ICICI Bank", type: "Personal Loan", accountNumber: "98765432101234567890", sanctionedAmount: 300994, outstanding: 228504, emi: 8605, rate: 16.5, emisPaid: 26, emisLeft: 22, loanStartDate: "23 Jan 2024", source: "bureau", verified: false, soaFile: null },
 ];
 
 interface LoanCardState {
