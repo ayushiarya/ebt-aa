@@ -53,6 +53,9 @@ export interface LoanState {
   selectedLoanCentre: { name: string; code: string; address: string } | null;
   setSelectedLoanCentre: (c: { name: string; code: string; address: string } | null) => void;
 
+  ddOption: "home" | "self";
+  setDdOption: (o: "home" | "self") => void;
+
   emi: number;
   totalOutstanding: number;
   totalCurrentEmi: number;
@@ -90,6 +93,7 @@ export const LoanProvider = ({ children }: { children: ReactNode }) => {
   const [editedBureauLoans, setEditedBureauLoans] = useState<Record<string, LoanEntry>>({});
   const [formData, setFormData] = useState<LoanFormData>(defaultFormData);
   const [editingLoan, setEditingLoan] = useState<LoanEntry | null>(null);
+  const [ddOption, setDdOption] = useState<"home" | "self">("home");
   const [selectedLoanCentre, setSelectedLoanCentre] = useState<{ name: string; code: string; address: string } | null>({
     name: "Mulund",
     code: "UTIB0000108",
@@ -157,6 +161,8 @@ export const LoanProvider = ({ children }: { children: ReactNode }) => {
         setTenure,
         selectedLoanCentre,
         setSelectedLoanCentre,
+        ddOption,
+        setDdOption,
         emi,
         totalOutstanding,
         totalCurrentEmi,
