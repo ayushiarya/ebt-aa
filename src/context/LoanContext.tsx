@@ -161,6 +161,7 @@ export const LoanProvider = ({ children }: { children: ReactNode }) => {
         updateLoan,
         editedBureauLoans,
         updateBureauLoan,
+        resetBureauLoans,
         editingLoan,
         setEditingLoan,
         formData,
