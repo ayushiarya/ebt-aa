@@ -38,6 +38,7 @@ export interface LoanState {
 
   editedBureauLoans: Record<string, LoanEntry>;
   updateBureauLoan: (loan: LoanEntry) => void;
+  resetBureauLoans: () => void;
 
   editingLoan: LoanEntry | null;
   setEditingLoan: (loan: LoanEntry | null) => void;
@@ -145,6 +146,10 @@ export const LoanProvider = ({ children }: { children: ReactNode }) => {
     setEditedBureauLoans((prev) => ({ ...prev, [loan.id]: loan }));
   };
 
+  const resetBureauLoans = () => {
+    setEditedBureauLoans({});
+  };
+
   const formatCurrency = (n: number) => "₹" + n.toLocaleString("en-IN");
 
   return (
@@ -156,6 +161,7 @@ export const LoanProvider = ({ children }: { children: ReactNode }) => {
         updateLoan,
         editedBureauLoans,
         updateBureauLoan,
+        resetBureauLoans,
         editingLoan,
         setEditingLoan,
         formData,

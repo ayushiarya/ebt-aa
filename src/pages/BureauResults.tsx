@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import AppHeader from "@/components/AppHeader";
 import { ChevronDown, ChevronUp, Pencil, Upload, X, Eye, Trash2, Info, Loader2 } from "lucide-react";
@@ -18,7 +18,11 @@ interface LoanCardState {
 
 const BureauResults = () => {
   const navigate = useNavigate();
-  const { setSelectedLoans, formatCurrency, setEditingLoan, editedBureauLoans, updateBureauLoan } = useLoan();
+  const { setSelectedLoans, formatCurrency, setEditingLoan, editedBureauLoans, updateBureauLoan, resetBureauLoans } = useLoan();
+
+  useEffect(() => {
+    resetBureauLoans();
+  }, []);
 
   const getLoans = useCallback(() => {
     return INITIAL_BUREAU_LOANS.map((initial) => {
