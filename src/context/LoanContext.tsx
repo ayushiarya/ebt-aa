@@ -146,6 +146,10 @@ export const LoanProvider = ({ children }: { children: ReactNode }) => {
     setEditedBureauLoans((prev) => ({ ...prev, [loan.id]: loan }));
   };
 
+  const resetBureauLoans = () => {
+    setEditedBureauLoans({});
+  };
+
   const formatCurrency = (n: number) => "₹" + n.toLocaleString("en-IN");
 
   return (
