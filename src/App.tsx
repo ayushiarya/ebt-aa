@@ -10,6 +10,7 @@ import BureauResults from "./pages/BureauResults";
 import OfferLoader from "./pages/OfferLoader";
 import LoanOffer from "./pages/LoanOffer";
 import MakePlan from "./pages/MakePlan";
+import DDOptions from "./pages/DDOptions";
 import ChooseLoanCentre from "./pages/ChooseLoanCentre";
 import ReviewLoan from "./pages/ReviewLoan";
 import TermsConditions from "./pages/TermsConditions";
@@ -34,6 +35,7 @@ const App = () => (
             <Route path="/offer-loader" element={<OfferLoader />} />
             <Route path="/loan-offer" element={<LoanOffer />} />
             <Route path="/make-plan" element={<MakePlan />} />
+            <Route path="/dd-options" element={<DDOptions />} />
             <Route path="/choose-centre" element={<ChooseLoanCentre />} />
             <Route path="/review" element={<ReviewLoan />} />
             <Route path="/terms" element={<TermsConditions />} />
