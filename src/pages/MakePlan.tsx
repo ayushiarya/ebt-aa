@@ -162,7 +162,7 @@ const MakePlan = () => {
             <p className="text-[10px] text-muted-foreground font-medium tracking-wider">NET DISBURSAL</p>
             <p className="text-xl font-bold text-foreground">{formatCurrency(netDisbursal)}</p>
           </div>
-          <button onClick={() => navigate("/choose-centre")}
+          <button onClick={() => navigate("/dd-options")}
             className="bg-primary text-primary-foreground px-8 py-3.5 rounded-xl font-semibold text-sm active:scale-[0.97] transition-transform shadow-md">
             Proceed
           </button>
