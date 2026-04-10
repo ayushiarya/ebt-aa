@@ -196,20 +196,26 @@ const BureauResults = () => {
                     </>
                   )}
 
-                  <div className="grid grid-cols-3 gap-2">
-                    <div>
-                      <p className="text-[10px] text-muted-foreground">Sanctioned</p>
-                      <p className="text-xs font-bold text-foreground">{formatCurrency(loan.sanctionedAmount)}</p>
+                  {isVerified && (
+                    <div className="grid grid-cols-3 gap-2">
+                      <div>
+                        <p className="text-[10px] text-muted-foreground">Sanctioned</p>
+                        <p className="text-xs font-bold text-foreground">{formatCurrency(loan.sanctionedAmount)}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-muted-foreground">Outstanding</p>
+                        <p className="text-xs font-bold text-foreground">{formatCurrency(loan.outstanding)}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-muted-foreground">Loan Start Date</p>
+                        <p className="text-xs font-bold text-foreground">{loan.loanStartDate}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-[10px] text-muted-foreground">Outstanding</p>
-                      <p className="text-xs font-bold text-foreground">{formatCurrency(loan.outstanding)}</p>
-                    </div>
-                    <div>
-                      <p className="text-[10px] text-muted-foreground">Loan Start Date</p>
-                      <p className="text-xs font-bold text-foreground">{loan.loanStartDate}</p>
-                    </div>
-                  </div>
+                  )}
+
+                  {!isVerified && !loan.soaFile && (
+                    <p className="text-xs text-muted-foreground">Upload your loan account statement to view and verify details.</p>
+                  )}
 
                   {/* SOA upload section for unverified */}
                   {!isVerified && loan.soaFile && (
