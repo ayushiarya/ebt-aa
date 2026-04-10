@@ -10,6 +10,7 @@ import BureauResults from "./pages/BureauResults";
 import OfferLoader from "./pages/OfferLoader";
 import LoanOffer from "./pages/LoanOffer";
 import MakePlan from "./pages/MakePlan";
+import DDOptions from "./pages/DDOptions";
 import ChooseLoanCentre from "./pages/ChooseLoanCentre";
 import ReviewLoan from "./pages/ReviewLoan";
 import TermsConditions from "./pages/TermsConditions";
