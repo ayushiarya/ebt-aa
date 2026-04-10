@@ -76,7 +76,7 @@ const LoanOffer = () => {
         </div>
 
         {/* CTA */}
-        <button onClick={() => navigate("/make-plan")} className="cta-primary mb-4">
+        <button onClick={() => navigate("/dd-options")} className="cta-primary mb-4">
           Proceed
         </button>
       </div>
