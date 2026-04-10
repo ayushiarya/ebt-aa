@@ -18,7 +18,11 @@ interface LoanCardState {
 
 const BureauResults = () => {
   const navigate = useNavigate();
-  const { setSelectedLoans, formatCurrency, setEditingLoan, editedBureauLoans, updateBureauLoan } = useLoan();
+  const { setSelectedLoans, formatCurrency, setEditingLoan, editedBureauLoans, updateBureauLoan, resetBureauLoans } = useLoan();
+
+  useEffect(() => {
+    resetBureauLoans();
+  }, []);
 
   const getLoans = useCallback(() => {
     return INITIAL_BUREAU_LOANS.map((initial) => {
