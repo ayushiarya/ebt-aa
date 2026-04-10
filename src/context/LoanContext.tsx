@@ -38,6 +38,7 @@ export interface LoanState {
 
   editedBureauLoans: Record<string, LoanEntry>;
   updateBureauLoan: (loan: LoanEntry) => void;
+  resetBureauLoans: () => void;
 
   editingLoan: LoanEntry | null;
   setEditingLoan: (loan: LoanEntry | null) => void;
